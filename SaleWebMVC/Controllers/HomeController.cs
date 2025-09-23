@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using SaleWebMVC.Models;
+using SaleWebMVC.Models.ViewModels;
 
 namespace SaleWebMVC.Controllers
 {
@@ -20,6 +21,12 @@ namespace SaleWebMVC.Controllers
 
         public IActionResult Privacy()
         {
+            ViewData["Message"] = "Your privacy page.";
+            return View();
+        }
+        public IActionResult About()
+        {
+            ViewData["Message"] = "Your application description page.";
             return View();
         }
 
