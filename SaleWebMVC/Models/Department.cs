@@ -1,4 +1,4 @@
-﻿namespace SaleWebMVC.Models
+﻿namespace SalesWebMVC.Models
 {
     public class Department
     {
@@ -7,6 +7,7 @@
 
         public Department()
         {
+
         }
         public Department(int id, string name)
         {

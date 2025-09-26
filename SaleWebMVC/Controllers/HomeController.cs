@@ -1,9 +1,9 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using SaleWebMVC.Models;
-using SaleWebMVC.Models.ViewModels;
+using SalesWebMVC.Models;
+using SalesWebMVC.Models.ViewModels;
 
-namespace SaleWebMVC.Controllers
+namespace SalesWebMVC.Controllers
 {
     public class HomeController : Controller
     {
