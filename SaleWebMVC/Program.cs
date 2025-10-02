@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Localization;
+using System.Globalization;
 using SalesWebMVC.Data;
 using SalesWebMVC.Services;
 using System.Configuration;
@@ -36,6 +38,29 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+
+
+//Locale
+var supportedCultures = new[]
+{
+    new CultureInfo("en-US"),
+    new CultureInfo("pt-BR")
+};
+
+var localizationOptions = new RequestLocalizationOptions
+{
+    DefaultRequestCulture = new RequestCulture("pt-BR"),
+    SupportedCultures = supportedCultures,
+    SupportedUICultures = supportedCultures
+};
+
+app.UseRequestLocalization(localizationOptions);
+
+app.UseRouting();
+
+app.UseAuthorization();
+
+
 
 app.UseRouting();
 
