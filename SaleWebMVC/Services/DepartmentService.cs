@@ -1,4 +1,5 @@
-﻿using SalesWebMVC.Data;
+﻿using Microsoft.EntityFrameworkCore; //inserido para usar o ToListAsync
+using SalesWebMVC.Data;
 using SalesWebMVC.Models;
 
 namespace SalesWebMVC.Services
@@ -12,9 +13,10 @@ namespace SalesWebMVC.Services
             _context = context;
         }
 
-        public List<Department> FindAll()
+        public async Task<List<Department>> FindAllAsync() //o sufixo Async é uma recomendação 
         {
-            return _context.Department.ToList();
+            return await _context.Department.OrderBy(x => x.Name).ToListAsync(); 
+            // await foi inserido por estarmos trabalhando com uma ação assícrona. 
         }
     }
 }
