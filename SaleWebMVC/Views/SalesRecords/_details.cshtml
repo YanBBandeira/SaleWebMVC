@@ -1,0 +1,45 @@
+﻿@using Microsoft.AspNetCore.Mvc.Rendering
+@using Microsoft.EntityFrameworkCore.Metadata.Internal
+@model SalesWebMVC.Models.ViewModels.SalesFromViewModel;
+
+
+
+
+<div class="container-fluid">
+    <div class="form-group mb-3">
+        <label class="form-label">Department</label>
+        <input class="form-control" value="@Model.Departments.FirstOrDefault(d => d.Id == Model.SalesRecord.DepartmentId)?.Name" readonly />
+    </div>
+
+    <div class="form-group mb-3">
+        <label class="form-label">Seller</label>
+        <input class="form-control" value="@Model.Sellers.FirstOrDefault(s => s.Id == Model.SalesRecord.SellerId)?.Name" readonly />
+    </div>
+
+    <div class="form-group mb-3">
+        <label class="form-label">Date</label>
+        <input class="form-control" value="@Model.SalesRecord.Date.ToString("yyyy-MM-dd")" readonly />
+    </div>
+
+    <div class="form-group mb-3">
+        <label class="form-label">Amount</label>
+        <div class="input-group">
+            <span class="input-group-text">$</span>
+            <input class="form-control" value="@Model.SalesRecord.Amount.ToString("F2")" readonly />
+        </div>
+    </div>
+
+    <div class="form-group mb-3">
+        <label class="form-label">Status</label>
+        <input class="form-control" value="@Model.SalesRecord.Status.ToString()" readonly />
+    </div>
+</div>
+
+
+
+
+
+
+
+
+

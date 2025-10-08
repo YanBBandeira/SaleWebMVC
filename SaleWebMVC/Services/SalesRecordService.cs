@@ -38,6 +38,10 @@ namespace SalesWebMVC.Services
 
         public async Task UpdateAsync(SalesRecord obj)
         {
+            if (obj == null)
+            {
+                throw new ArgumentNullException(nameof(obj), "The SalesRecord object cannot be null");
+            }
             bool hasAny = await _context.SalesRecords.AnyAsync(x => x.Id == obj.Id);
             if (!hasAny)
             {
@@ -74,7 +78,7 @@ namespace SalesWebMVC.Services
                 .ToListAsync();
         }
 
-        public async Task<List<IGrouping<Department,SalesRecord>>> FindByDateGroupingAsync(DateTime? minDate, DateTime? maxDate)
+        public async Task<List<IGrouping<Department, SalesRecord>>> FindByDateGroupingAsync(DateTime? minDate, DateTime? maxDate)
         {
             var result = from obj in _context.SalesRecords select obj;
             if (minDate.HasValue)
@@ -96,7 +100,14 @@ namespace SalesWebMVC.Services
 
         public async Task<List<SalesRecord>> FindAllByAsync()
         {
-            return await _context.SalesRecords.ToListAsync();
+            return await _context.SalesRecords.Include(x => x.Seller)
+                .Include(x => x.Seller.Department).ToListAsync();
+        }
+
+        public async Task<SalesRecord> FindByIdAsync(int id)
+        {
+           return await _context.SalesRecords.Include(x => x.Seller)
+                .Include(x => x.Seller.Department).FirstOrDefaultAsync(obj => obj.Id == id);
         }
      }
 }

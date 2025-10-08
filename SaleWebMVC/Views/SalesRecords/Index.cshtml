@@ -1,100 +1,99 @@
-﻿@{
-    ViewData["Title"] = "Sales Records";
+﻿@model IEnumerable<SalesWebMVC.Models.SalesRecord>
+
+@{
+    ViewData["Title"] = "Sales";
 }
 
 <h2>@ViewData["Title"]</h2>
 
-<div class="d-flex justify-content-end">
+<div class="d-flex justify-content-end mt-1">
     <a asp-action="Create" class="btn btn-success">New sale</a>
 </div>
+<div class="accordion mt-1">
+    <div class="accordion-item">
+        <h2 class="accordion-header" id="headingOne">
+            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                Search
+            </button>
+        </h2>
+        <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#accordionExample" style="">
+            <div class="accordion-body">
 
-<div class="container mt-4">
-    <div class="row">
-        <div class="col-md-6 p-3">
-            <form id="simpleSearchForm" class="form-horizontal" asp-action="SimpleSearch">
-                <fieldset>
-                    <legend>Simple search</legend>
-                    <div class="form-group">
-                        <label for="minDate" class="col-lg-2 control-label">Min Date</label>
-                        <div class="col-lg-10">
-                            <input id="simpleMinDate" type="date" name="minDate" class="form-control" />
+                <div class="container mt-4">
+                    <div class="row">
+                        <div class="col-md-6 p-3">
+                            <form id="simpleSearchForm" class="form-horizontal" asp-action="SimpleSearch">
+                                <fieldset>
+                                    <legend>Simple search</legend>
+                                    <div class="form-group">
+                                        <label for="minDate" class="col-lg-2 control-label">Min Date</label>
+                                        <div class="col-lg-10">
+                                            <input id="simpleMinDate" type="date" name="minDate" class="form-control" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="minDate" class="col-lg-2 control-label">Max Date</label>
+                                        <div class="col-lg-10">
+                                            <input type="date" name="minDate" class="form-control" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group mt-2">
+                                        <button type="submit" value="Search" class="btn btn-primary">Submit</button>
+                                    </div>
+                                </fieldset>
+                            </form>
+                        </div>
+                        <div class="col-md-6 p-3">
+                            <form id="groupSearchForm" class="form-horizontal" asp-action="GroupSearch">
+                                <fieldset>
+                                    <legend>Group search</legend>
+                                    <div class="form-group">
+                                        <label for="minDate" class="col-lg-2 control-label">Min Date</label>
+                                        <div class="col-lg-10">
+                                            <input type="date" name="minDate" class="form-control" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="minDate" class="col-lg-2 control-label">Max Date</label>
+                                        <div class="col-lg-10">
+                                            <input type="date" name="minDate" class="form-control" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group mt-2">
+                                        <button type="submit" value="Search" class="btn btn-primary">Submit</button>
+                                    </div>
+                                </fieldset>
+                            </form>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <label for="minDate" class="col-lg-2 control-label">Max Date</label>
-                        <div class="col-lg-10">
-                            <input type="date" name="minDate" class="form-control" />
-                        </div>
-                    </div>
-                    <div class="form-group mt-2">
-                        <button type="submit" class="btn btn-primary">Submit</button>
-                    </div>
-                </fieldset>
-            </form>
-        </div>
-        <div class="col-md-6 p-3">
-            <form id="groupSearchForm" class="form-horizontal" asp-action="GroupSearch">
-                <fieldset>
-                    <legend>Group search</legend>
-                    <div class="form-group">
-                        <label for="minDate" class="col-lg-2 control-label">Min Date</label>
-                        <div class="col-lg-10">
-                            <input type="date" name="minDate" class="form-control" />
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="minDate" class="col-lg-2 control-label">Max Date</label>
-                        <div class="col-lg-10">
-                            <input type="date" name="minDate" class="form-control" />
-                        </div>
-                    </div>
-                    <div class="form-group mt-2">
-                        <button type="submit" class="btn btn-primary">Submit</button>
-                    </div>
-                </fieldset>
-            </form>
+                </div>
+            </div>
         </div>
     </div>
 </div>
-
 <!-- Container onde a tabela será carregada via AJAX -->
 <div id="salesResults">
+    @await Html.PartialAsync("_allSales", Model)
+</div>
+
+<!-- Modal para detalhes -->
+<div class="modal fade" id="detailsModal" tabindex="-1" role="dialog" aria-labelledby="detailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="detailsModalLabel">Sales Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="detailsModalBody">
+            </div>
+        </div>
+    </div>
 </div>
 
 
 @section Scripts {
     <script>
-        $(document).ready(function () {
-            // Função genérica para envio via AJAX
-            function submitFormAjax(formId) {
-                let form = $(formId);
-                let url = form.attr('action');
-                let data = form.serialize();
-
-                $.ajax({
-                    type: 'GET',
-                    url: url,
-                    data: data,
-                    success: function (partialViewResult, status, xhr) {
-                        $('#salesResults').html(partialViewResult);
-
-                    },
-                    error: function () {
-                        alert('Erro ao buscar resultados.');
-                    }
-                });
-            }
-
-            // Captura o submit dos dois formulários
-            $('#simpleSearchForm').submit(function (e) {
-                e.preventDefault();
-                submitFormAjax('#simpleSearchForm');
-            });
-
-            $('#groupSearchForm').submit(function (e) {
-                e.preventDefault();
-                submitFormAjax('#groupSearchForm');
-            });
-        });
+        const detailsUrl = '@Url.Action("Details", "SalesRecords")';
     </script>
+    <script src="~/js/SalesRecords/SalesRecords-Index.js" defer></script>
 }
