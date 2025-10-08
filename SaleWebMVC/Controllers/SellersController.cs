@@ -8,6 +8,7 @@ using SalesWebMVC.Models.ViewModels;
 using SalesWebMVC.Services;
 using SalesWebMVC.Services.Exceptions;
 using System.Diagnostics;
+using System.Text.Json;
 
 namespace SalesWebMVC.Controllers
 {
@@ -74,7 +75,7 @@ namespace SalesWebMVC.Controllers
             }
             catch (IntegrityException ex)
             {
-                return RedirectToAction(nameof(Error), new { message = ex.Message});
+                return RedirectToAction(nameof(Error), new { message = ex.Message });
             }
         }
 
@@ -145,5 +146,33 @@ namespace SalesWebMVC.Controllers
             };
             return View(viewModel);
         }
+
+        // Exemplo em SellersController.cs (ou onde você lida com Sellers)
+
+        [HttpGet]
+        public async Task<IActionResult> GetSellersByDepartment(int departmentId)
+        {
+            try
+            {
+                //Console.WriteLine("Recebido departmentId: " + departmentId);
+                var sellers = await _sellerService.FindByDepartmentIdAsync(departmentId);
+                Console.WriteLine(JsonSerializer.Serialize(sellers));
+                // Projeta o resultado para um formato JSON mais limpo (opcional, mas recomendado)
+                var result = sellers.Select(s => new
+                {
+                    id = s.Id,
+                    name = s.Name
+                }).ToList();
+                //Console.WriteLine(result.ToString());
+                // Retorna a lista como JSON. A função AJAX do jQuery irá consumir isso.
+                return Json(result);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error in GetSellersByDepartment: " + ex.Message);
+                return StatusCode(500, "Server error");
+            }
+        }
+
     }
 }

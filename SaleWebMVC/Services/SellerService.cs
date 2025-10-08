@@ -45,7 +45,6 @@ namespace SalesWebMVC.Services
             {
                 throw new IntegrityException(ex.Message);
             }
-
         }
 
         public async Task UpdateAsync(Seller obj)
@@ -64,6 +63,18 @@ namespace SalesWebMVC.Services
             {
                 throw new DbConcurrencyException(ex.Message);
             }
+        }
+
+        public async Task<List<Seller>> FindByDepartmentIdAsync(int? departmentId)
+        {
+            var result = from obj in _context.Seller select obj;
+            
+            if (departmentId.HasValue)
+            {
+                result = result.Where(x => x.Department.Id == departmentId.Value);
+            }
+            
+            return await result.ToListAsync();
         }
     }
 }

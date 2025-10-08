@@ -1,0 +1,162 @@
+﻿@using Microsoft.AspNetCore.Mvc.Rendering
+@using Microsoft.EntityFrameworkCore.Metadata.Internal
+@model SalesWebMVC.Models.ViewModels.SalesFromViewModel;
+
+@{
+    ViewData["Title"] = "New sale";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<hr />
+
+<div class="row align-content-center">
+    <div class="col-md-8">
+        <div asp-validation-summary="All" class="text-danger"></div>
+        <form asp-action="Create" id="createForm">
+            <div class="form-group">
+
+                <div class="form-group p-m-2">
+                    <label asp-for="SalesRecord.DepartmentId" class="control-label">Department</label>
+                    <select id="DepartmentId"
+                            asp-for="SalesRecord.DepartmentId"
+                            asp-items="@(new SelectList(Model.Departments, "Id", "Name"))"
+                            class="form-control">
+                        <option value="">-- Select the department --</option>
+                    </select>
+                </div>
+
+                <div class="form-group p-m-2">
+                    <label asp-for="SalesRecord.SellerId" class="control-label">Seller</label>
+                    <select id="SellerId"
+                            asp-for="SalesRecord.SellerId"
+                            class="form-control">
+                        <option value="">-- Select the Seller --</option>
+                    </select>
+                </div>
+
+                <div class="form-group p-m-2">
+                    <label asp-for="SalesRecord.Date" class="control-label"></label>
+                    <input asp-for="SalesRecord.Date" class="form-control" />
+
+                </div>
+                <div class="form-group p-m-2">
+                    <label asp-for="SalesRecord.Amount" class="control-label"></label>
+                    <div class="input-group">
+                        <span class="input-group-text">$</span>
+                        <input asp-for="SalesRecord.Amount" class="form-control" />
+                    </div>
+                </div>
+
+                <div class="form-group p-m-2">
+                    <label asp-for="SalesRecord.Status" class="control-label"></label>
+                    <select asp-for="SalesRecord.Status" asp-items="Html.GetEnumSelectList<SalesWebMVC.Models.Enums.SalesStatus>()" class="form-control"></select>
+                </div>
+                <div class="form-group">
+                    <input type="submit" value="Create" class="btn btn-primary" />
+                </div>
+
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+    <div class="modal-dialog justify-content-center">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="successModalLabel">Sucesso</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                Created with sucess!
+            </div>
+            <div class="modal-footer text-center w-100">
+                <button type="button" id="goToIndexBtn" class="btn btn-primary align-content-center">Ok</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // 1. Detecta a mudança no Select de Departamento
+            $('#DepartmentId').change(function () {
+                var selectedDepartmentId = $(this).val();
+                var sellerSelect = $('#SellerId');
+
+                // Limpa o select de Vendedor
+                sellerSelect.empty();
+                sellerSelect.append('<option value="">-- Carregando Vendedores --</option>');
+
+                if (selectedDepartmentId) {
+                    // 2. Faz uma chamada AJAX para o Controller
+                    $.ajax({
+                        url: '@Url.Action("GetSellersByDepartment", "Sellers")', // Ajuste o nome do Controller/Action
+                        type: 'GET',
+                        data: { departmentId: selectedDepartmentId }, // Envia o ID selecionado
+                        success: function (sellers) {
+                            // 3. Sucesso: Limpa e popula o select de Vendedor
+                            sellerSelect.empty();
+                            sellerSelect.append('<option value="">-- Selecione o Vendedor --</option>');
+
+                            $.each(sellers, function (index, seller) {
+                                sellerSelect.append('<option value="' + seller.id + '">' + seller.name + '</option>');
+                            });
+                        },
+                        error: function () {
+                            sellerSelect.empty();
+                            sellerSelect.append('<option value="">Erro ao carregar vendedores</option>');
+                        }
+                    });
+                } else {
+                    // Se nenhum departamento for selecionado, esvazia o select
+                    sellerSelect.empty();
+                    sellerSelect.append('<option value="">-- Selecione o Vendedor --</option>');
+                }
+            });
+        });
+        $(document).ready(function () {
+            $('#createForm').submit(function (e) {
+                e.preventDefault(); // impede envio tradicional
+
+                var form = $(this);
+                var url = form.attr('action') || '@Url.Action("Create", "SalesRecords")'; // ajuste conforme seu controller
+                var data = form.serialize(); // pega os dados do form
+
+                $.ajax({
+                    type: "POST",
+                    url: url,
+                    data: data,
+                    success: function (response) {
+                        // Exibe o modal só se o servidor retornar sucesso
+                        var modal = new bootstrap.Modal(document.getElementById('successModal'));
+                        modal.show();
+
+                        // Você pode limpar o form se quiser:
+                        form[0].reset();
+                    },
+                    error: function () {
+                        alert("Erro ao criar. Verifique os dados e tente novamente.");
+                    }
+                });
+            });
+        });
+        $(document).ready(function () {
+                // Redireciona para a página Index ao clicar no botão da modal
+            $('#goToIndexBtn').click(function () {
+                window.location.href = '@Url.Action("Index", "SalesRecords")';
+            });
+        });
+        $(document).ready(function () {
+            // Define o valor da data como o dia de hoje no formato YYYY-MM-DD
+            let today = new Date().toISOString().split('T')[0];
+            $('input[name="SalesRecord.Date"]').val(today);
+        });
+    </script>
+}

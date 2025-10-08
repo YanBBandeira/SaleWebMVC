@@ -1,29 +1,9 @@
-﻿@model  IEnumerable<IGrouping<Department,SalesRecord>>
+﻿@model IEnumerable<IGrouping<Department,SalesRecord>>
 
 @{
-    ViewData["Title"] = "Group Search";
     DateTime minDate = DateTime.Parse(ViewData["minDate"] as string);
     DateTime maxDate = DateTime.Parse(ViewData["maxDate"] as string);
-    // estamos criando uma data a partir do ViewData com o upcast para string
 }
-
-<h2>@ViewData["Title"]</h2>
-
-<nav class="navbar navbar-expand-lg bg-light p-4">
-    <div class="container-fluid">
-        <form class="d-flex flex-row align-items-center flex-wrap" role="search">
-
-            <label for="minDate" class="form-label">Min Date</label>
-            <input type="date" class="form-control me-sm-2 p-2" name="minDate" value=@ViewData["minDate"] />
-
-            <label for="maxDate" class="form-label">Max Date</label>
-            <input type="date" class="form-control me-sm-2 p-2" name="maxDate" value=@ViewData["maxDate"] />
-
-            <button type="submit" class="btn btn-secondary mt-2">Filter</button>
-            <!--Como não informamos para onde submeter a info desse botão, o framework automaticamente envia para a ação conectada a esta view-->
-        </form>
-    </div>
-</nav>
 
 @foreach (var departmentGroup in Model)
 {
@@ -50,27 +30,34 @@
                         <th>
                             Status
                         </th>
+                        <th>
+
+                        </th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach (var item in departmentGroup)
                     {
                         <tr class="table-bordered">
-                            <th>
+                            <td>
                                 @Html.DisplayFor(modelItem => item.Id)
-                            </th>
-                            <th>
+                            </td>
+                            <td>
                                 @Html.DisplayFor(modelItem => item.Date)
-                            </th>
-                            <th>
+                            </td>
+                            <td>
                                 @Html.DisplayFor(modelItem => item.Seller.Name)
-                            </th>
-                            <th>
+                            </td>
+                            <td>
                                 @Html.DisplayFor(modelItem => item.Amount)
-                            </th>
-                            <th>
+                            </td>
+                            <td>
                                 @Html.DisplayFor(modelItem => item.Status)
-                            </th>
+                            </td>
+                            <td>
+                                <a class="btn btn-outline-primary" asp-action="Edit" asp-route-id="@item.Id">Edit</a>
+                                <a class="btn btn-outline-info" asp-action="Details" asp-route-id="@item.Id">Details</a>
+                            </td>
                         </tr>
                     }
                 </tbody>
