@@ -11,7 +11,6 @@
             data: data,
             success: function (partialViewResult, status, xhr) {
                 $('#salesResults').html(partialViewResult);
-
             },
             error: function () {
                 alert('Erro ao buscar resultados.');
@@ -30,6 +29,10 @@
         submitFormAjax('#groupSearchForm');
     });
 });
+
+
+
+
 // Evento de click para abrir modal de detalhes
 $(document).on('click', '.view-details', function (e) {
     e.preventDefault();
@@ -49,3 +52,5 @@ $(document).on('click', '.view-details', function (e) {
         }
     });
 });
+
+
