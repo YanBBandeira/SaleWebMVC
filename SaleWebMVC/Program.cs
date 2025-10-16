@@ -14,8 +14,8 @@ internal class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
-        builder.Services.AddDbContext<SalesWebMVCContext>(options => options.UseMySql(builder.Configuration.GetConnectionString("SalesWebMVCContext"),
-            ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("SalesWebMVCContext")),
+        builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseMySql(builder.Configuration.GetConnectionString("ApplicationDbContext"),
+            ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("ApplicationDbContext")),
             builder => builder.MigrationsAssembly("SalesWebMVC")));
 
         builder.Services.AddScoped<SeedingService>();
@@ -34,7 +34,7 @@ internal class Program
         )
         .AddRoles<IdentityRole>() // habilita perfis
         .AddDefaultTokenProviders() // habilita a funcionalidade de reset de senha
-        .AddEntityFrameworkStores<SalesWebMVCContext>(); // define o SalesWebMVCContext como o banco de dados de identidade
+        .AddEntityFrameworkStores<ApplicationDbContext>(); // define o ApplicationDbContext como o banco de dados de identidade
 
         builder.Services.ConfigureApplicationCookie(options =>
         {
@@ -44,17 +44,21 @@ internal class Program
 
         var app = builder.Build(); // constrói o aplicativo
 
-        await SeedService.SeedAsync(app.Services); // Chama o método SeedAsync para popular o banco de dados
-
-        if (app.Environment.IsDevelopment())
+        // SEEDING DE DADOS (corrigido):
+        using (var scope = app.Services.CreateScope())
         {
-            using (var scope = app.Services.CreateScope())
+            var seedingService = scope.ServiceProvider.GetRequiredService<SeedingService>();
+            try
             {
-                var services = scope.ServiceProvider;
-                var seedingService = services.GetRequiredService<SeedingService>();
-                seedingService.Seed(); // aqui você popula o banco
+                await seedingService.SeedAsync();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Program: Error: An error occurred seeding the DB.\n{e.Message}");
             }
         }
+
+
 
         // Configure the HTTP request pipeline.
         if (!app.Environment.IsDevelopment())
@@ -71,9 +75,9 @@ internal class Program
         //Locale
         var supportedCultures = new[]
         {
-    new CultureInfo("en-US"),
-    new CultureInfo("pt-BR")
-};
+            new CultureInfo("en-US"),
+            new CultureInfo("pt-BR")
+        };
 
         var localizationOptions = new RequestLocalizationOptions
         {
@@ -92,8 +96,8 @@ internal class Program
 
         app.MapControllerRoute(
             name: "default",
-           pattern: "{controller=Home}/{action=Index}/{id?}"); // Rota padrão
-           // pattern: "{controller=Account}/{action=Login}/{id?}");
+            pattern: "{controller=Home}/{action=Index}/{id?}"); // Rota padrão
+            //pattern: "{controller=Account}/{action=Login}/{id?}");
         app.Run(); // Inicia o aplicativo
     }
 }

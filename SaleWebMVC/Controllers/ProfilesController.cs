@@ -34,7 +34,8 @@ namespace SalesWebMVC.Controllers
                 userList.Add(new ProfilesIndexViewModel
                 {
                     Id = user.Id,
-                    Name = user.UserName,
+                    Login = user.UserName,
+                    Name = user.UserFullName,
                     Email = user.Email,
                     Role = roles.FirstOrDefault().ToString() ?? "None"
                 });

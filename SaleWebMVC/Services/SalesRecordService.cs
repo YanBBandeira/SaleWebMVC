@@ -9,9 +9,9 @@ namespace SalesWebMVC.Services
 {
     public class SalesRecordService
     {
-        private readonly SalesWebMVCContext _context;
+        private readonly ApplicationDbContext _context;
 
-        public SalesRecordService(SalesWebMVCContext context)
+        public SalesRecordService(ApplicationDbContext context)
         {
             _context = context;
         }
@@ -60,7 +60,7 @@ namespace SalesWebMVC.Services
 
         public async Task<List<SalesRecord>> FindByDateAsync(DateTime? minDate, DateTime? maxDate)
         {
-            var result = from obj in _context.SalesRecords select obj;
+            var result = _context.SalesRecords.AsQueryable();
             if (minDate.HasValue)
             {
                 result = result.Where(x => x.Date >= minDate.Value);
@@ -72,15 +72,15 @@ namespace SalesWebMVC.Services
             }
 
             return await result
-                .Include(x => x.Seller)
-                .Include(x => x.Seller.Department)
+                .Include(x => x.Seller)            // Seller é ApplicationUser
+                .ThenInclude(s => s.Department)   // Include Department via ApplicationUser
                 .OrderByDescending(x => x.Date)
                 .ToListAsync();
         }
 
         public async Task<List<IGrouping<Department, SalesRecord>>> FindByDateGroupingAsync(DateTime? minDate, DateTime? maxDate)
         {
-            var result = from obj in _context.SalesRecords select obj;
+            var result = _context.SalesRecords.AsQueryable();
             if (minDate.HasValue)
             {
                 result = result.Where(x => x.Date >= minDate.Value);
@@ -92,7 +92,7 @@ namespace SalesWebMVC.Services
             }
             return await result
                 .Include(x => x.Seller)
-                .Include(x => x.Seller.Department)
+                .ThenInclude(x => x.Department)
                 .OrderByDescending(x => x.Date)
                 .GroupBy(x => x.Seller.Department)
                 .ToListAsync();
@@ -100,14 +100,17 @@ namespace SalesWebMVC.Services
 
         public async Task<List<SalesRecord>> FindAllByAsync()
         {
-            return await _context.SalesRecords.Include(x => x.Seller)
-                .Include(x => x.Seller.Department).ToListAsync();
+            return await _context.SalesRecords
+                .Include(x => x.Seller)
+                .ThenInclude(x => x.Department).ToListAsync();
         }
 
         public async Task<SalesRecord> FindByIdAsync(int id)
         {
-           return await _context.SalesRecords.Include(x => x.Seller)
-                .Include(x => x.Seller.Department).FirstOrDefaultAsync(obj => obj.Id == id);
+           return await _context.SalesRecords
+                .Include(x => x.Seller)
+                .ThenInclude(x => x.Department)
+                .FirstOrDefaultAsync(obj => obj.Id == id);
         }
      }
 }

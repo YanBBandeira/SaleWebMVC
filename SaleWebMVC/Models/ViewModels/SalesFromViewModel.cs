@@ -8,7 +8,7 @@ namespace SalesWebMVC.Models.ViewModels
         public SalesRecord SalesRecord { get; set; }
 
         // A LISTA de vendedores disponíveis para o dropdown
-        public ICollection<Seller> Sellers { get; set; }
+        public ICollection<ApplicationUser> Sellers { get; set; }
 
         // Lista de departamentos
 

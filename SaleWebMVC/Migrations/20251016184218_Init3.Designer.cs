@@ -11,9 +11,9 @@ using SalesWebMVC.Data;
 
 namespace SalesWebMVC.Migrations
 {
-    [DbContext(typeof(SalesWebMVCContext))]
-    [Migration("20251015172651_Teste1")]
-    partial class Teste1
+    [DbContext(typeof(ApplicationDbContext))]
+    [Migration("20251016184218_Init3")]
+    partial class Init3
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -169,9 +169,18 @@ namespace SalesWebMVC.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
 
+                    b.Property<double?>("BaseSalary")
+                        .HasColumnType("double");
+
+                    b.Property<DateTime?>("BirthDate")
+                        .HasColumnType("datetime(6)");
+
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .HasColumnType("longtext");
+
+                    b.Property<int?>("DepartmentId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Email")
                         .HasMaxLength(256)
@@ -219,6 +228,8 @@ namespace SalesWebMVC.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("DepartmentId");
+
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
 
@@ -244,7 +255,7 @@ namespace SalesWebMVC.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Department");
+                    b.ToTable("Departments");
                 });
 
             modelBuilder.Entity("SalesWebMVC.Models.SalesRecord", b =>
@@ -264,8 +275,9 @@ namespace SalesWebMVC.Migrations
                     b.Property<int>("DepartmentId")
                         .HasColumnType("int");
 
-                    b.Property<int>("SellerId")
-                        .HasColumnType("int");
+                    b.Property<string>("SellerId")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
@@ -275,39 +287,6 @@ namespace SalesWebMVC.Migrations
                     b.HasIndex("SellerId");
 
                     b.ToTable("SalesRecords");
-                });
-
-            modelBuilder.Entity("SalesWebMVC.Models.Seller", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<double>("BaseSalary")
-                        .HasColumnType("double");
-
-                    b.Property<DateTime>("BirthDate")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<int>("DepartmentId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(60)
-                        .HasColumnType("varchar(60)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("DepartmentId");
-
-                    b.ToTable("Seller");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -361,10 +340,20 @@ namespace SalesWebMVC.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("SalesWebMVC.Models.ApplicationUser", b =>
+                {
+                    b.HasOne("SalesWebMVC.Models.Department", "Department")
+                        .WithMany("Sellers")
+                        .HasForeignKey("DepartmentId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.Navigation("Department");
+                });
+
             modelBuilder.Entity("SalesWebMVC.Models.SalesRecord", b =>
                 {
-                    b.HasOne("SalesWebMVC.Models.Seller", "Seller")
-                        .WithMany("Sales")
+                    b.HasOne("SalesWebMVC.Models.ApplicationUser", "Seller")
+                        .WithMany("SalesRecords")
                         .HasForeignKey("SellerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -372,25 +361,14 @@ namespace SalesWebMVC.Migrations
                     b.Navigation("Seller");
                 });
 
-            modelBuilder.Entity("SalesWebMVC.Models.Seller", b =>
+            modelBuilder.Entity("SalesWebMVC.Models.ApplicationUser", b =>
                 {
-                    b.HasOne("SalesWebMVC.Models.Department", "Department")
-                        .WithMany("Sellers")
-                        .HasForeignKey("DepartmentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Department");
+                    b.Navigation("SalesRecords");
                 });
 
             modelBuilder.Entity("SalesWebMVC.Models.Department", b =>
                 {
                     b.Navigation("Sellers");
-                });
-
-            modelBuilder.Entity("SalesWebMVC.Models.Seller", b =>
-                {
-                    b.Navigation("Sales");
                 });
 #pragma warning restore 612, 618
         }

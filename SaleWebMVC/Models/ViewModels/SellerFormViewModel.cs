@@ -6,6 +6,6 @@ namespace SalesWebMVC.Models.ViewModels
     {
         public ICollection<Department> Departments { get; set; }
 
-        public Seller Seller { get; set; }
+        public ApplicationUser Seller { get; set; }
     }
 }

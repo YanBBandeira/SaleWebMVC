@@ -17,7 +17,7 @@
                 <tr class="table-info">
                     <th>@Html.DisplayNameFor(model => model.First().Id)</th>
                     <th>@Html.DisplayNameFor(model => model.First().Date)</th>
-                    <th>@Html.DisplayNameFor(model => model.First().Seller.Name)</th>
+                    <th>@Html.DisplayNameFor(model => model.First().Seller.UserFullName)</th>
                     <th>@Html.DisplayNameFor(model => model.First().Seller.Department.Name)</th>
                     <th>@Html.DisplayNameFor(model => model.First().Amount)</th>
                     <th>@Html.DisplayNameFor(model => model.First().Status)</th>
@@ -32,7 +32,7 @@
                     @(item.Status.ToString() == "Canceled" ? "text-decoration-line-through text-danger" : "")">
                         <td>@item.Id</td>
                         <td>@item.Date.ToString("dd/MM/yyyy")</td>
-                        <td>@item.Seller.Name</td>
+                        <td>@item.Seller.UserFullName</td>
                         <td>@item.Seller.Department.Name</td>
                         <td>@item.Amount.ToString("F2")</td>
                         <td>@item.Status</td>

@@ -89,15 +89,22 @@ namespace SalesWebMVC.Controllers
             {
                 return RedirectToAction(nameof(Error), new { message = "Id not provided." });
             }
+            var salesRecord = await _salesRecordService.FindByIdAsync(id);
+
+            if (salesRecord == null)
+            {
+                return RedirectToAction(nameof(Error), new { message = "Sales record not found." });
+            }
 
             var departments = await _departmentService.FindAllAsync();
             var sellers = await _sellerService.FindAllAsync();
-            var salesRecord = await _salesRecordService.FindByIdAsync(id);
+           
             var viewModel = new SalesFromViewModel
             {
                 SalesRecord = salesRecord,
                 Departments = departments,
-                Sellers = sellers
+                Sellers = sellers,
+                Status = salesRecord.Status  // opcional, se usado em dropdown
             };
             return View(viewModel);
         }

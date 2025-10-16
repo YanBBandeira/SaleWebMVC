@@ -14,10 +14,10 @@ namespace SalesWebMVC.Models
         [DisplayFormat(DataFormatString = "{0:F2}")] //0 representa o valor do atributo
         public double Amount { get; set; }
         public SalesStatus Status { get; set; }
-        public Seller Seller { get; set; }
+        public ApplicationUser Seller { get; set; }
 
         [Display(Name = "Seller")]
-        public int SellerId { get; set; }
+        public string SellerId { get; set; }
 
         [Display(Name = "Department")]
         public int DepartmentId { get; set; }
@@ -26,7 +26,7 @@ namespace SalesWebMVC.Models
         { 
         }
 
-        public SalesRecord(int id, DateTime date, double amount, SalesStatus status, Seller seller)
+        public SalesRecord(int id, DateTime date, double amount, SalesStatus status, ApplicationUser seller)
         {
             Id = id;
             Date = date;
