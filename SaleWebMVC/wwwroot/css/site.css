@@ -1,4 +1,4 @@
-html {
+﻿html {
   font-size: 14px;
 }
 
@@ -19,4 +19,29 @@ html {
 
 body {
   margin-bottom: 60px;
+}
+
+.title-form {
+    margin: 0;
+    padding: 10px 20px;
+    background-color: #d9edf6;
+    color: #4498c9;
+    font-weight: bold;
+    border-top-left-radius: inherit;
+    border-top-right-radius: inherit;
+    border-bottom: inherit;
+}
+
+.content-form {
+    padding: 15px 20px;
+}
+
+.box-form {
+    border: solid 1px #639fc0;
+    padding: 0;
+    border-radius: 5px;
+}
+
+.form-group {
+    margin-bottom: 15px;
 }

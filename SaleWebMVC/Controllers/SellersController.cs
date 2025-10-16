@@ -1,14 +1,15 @@
 ﻿using Microsoft.AspNetCore.Authentication;
-using Microsoft.EntityFrameworkCore; //inserido para usar o ToListAsync
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore; //inserido para usar o ToListAsync
 using NuGet.Protocol.Plugins;
-using System.Threading.Tasks;
 using SalesWebMVC.Models;
 using SalesWebMVC.Models.ViewModels;
 using SalesWebMVC.Services;
 using SalesWebMVC.Services.Exceptions;
 using System.Diagnostics;
 using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace SalesWebMVC.Controllers
 {
@@ -16,11 +17,14 @@ namespace SalesWebMVC.Controllers
     {
         private readonly SellerService _sellerService;
         private readonly DepartmentService _departmentService;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public SellersController(SellerService sellerService, DepartmentService departmentService)
+
+        public SellersController(SellerService sellerService, DepartmentService departmentService, UserManager<ApplicationUser> userManager)
         {
             _sellerService = sellerService;
             _departmentService = departmentService;
+            _userManager = userManager;
         }
         public async Task<IActionResult> Index()
         {
@@ -30,6 +34,7 @@ namespace SalesWebMVC.Controllers
 
         public async Task<IActionResult> Create()
         {
+            ViewBag.Users = await _userManager.Users.AsQueryable().ToListAsync();
             var departments = await _departmentService.FindAllAsync();
             var viewModel = new SellerFormViewModel { Departments = departments };
             return View(viewModel);

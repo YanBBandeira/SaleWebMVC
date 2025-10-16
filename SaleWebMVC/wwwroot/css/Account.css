@@ -1,0 +1,22 @@
+﻿.account-container {
+    background-image: url('/Images/loginBackground.png') !important;
+    background-size: cover !important;
+    background-position: center !important;
+    background-repeat: repeat-y !important;
+    min-height: 100vh !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+}
+
+
+.account-box {
+    background-color: rgba(255, 255, 255, 0.9) !important;
+    padding: 30px !important;
+    border-radius: 10px !important;
+    box-shadow: 0 0 10px rgba(0,0,0,0.3) !important;
+    max-width: 500px !important;
+    width: 100% !important;
+}
+
+
