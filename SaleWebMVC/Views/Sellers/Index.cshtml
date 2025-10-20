@@ -24,20 +24,27 @@
                         <div class="form-group col-md-6 no-padding">
                             <label class="col-md-4 control-label text-right no-padding" for="Name">Name</label>
                             <div class="col-md-8">
-                                <input class="form-control" type="text" id="Name" name="Name">
+                                <input class="form-control" type="text" id="Name" name="Name" placeholder="Inser name">
                             </div>
                         </div>
                         <div class="form-group col-md-6 no-padding">
-                            <label class="col-md-4 control-label text-right no-padding" for="s2id_autogen10">Department</label>
+                            <label class="col-md-6 control-label text-right no-padding" for="DepartmentIds">Department</label>
+                            <div class="col-md-8">
+                                <select id="DepartmentIds" name="DepartmentIds" multiple class="form-control select2">
+                                    @foreach (var dept in ViewBag.Departments as List<Department>)
+                                    {
+                                        <option value="@dept.Id">@dept.Name</option>
+                                    }
+                                </select>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="card-footer text-right">
-                    <button type="button" class="btn btn-flat btn-labeled" onclick="LimparCampos()" style="margin: 0px 10px;"><span class="btn-label icon fa fa-trash-o"></span>Clean</button>
-                    <button type="submit" class="btn btn-primary btn-labeled btn-flat"><span class="btn-label icon fa fa-filter"></span>Search</button>
+                    <div class="card-footer text-right">
+                        <button type="button" class="btn btn-flat btn-labeled" onclick="LimparCampos()" style="margin: 0px 10px;"><span class="btn-label icon fa fa-trash-o"></span>Clean</button>
+                        <button type="submit" class="btn btn-primary btn-labeled btn-flat"><span class="btn-label icon fa fa-filter"></span>Search</button>
+                    </div>
                 </div>
-            </div>
         </form>
     </div>
 </div>
@@ -91,3 +98,57 @@
 </div>
 
 
+@section scripts {
+    <script>
+            $(document).ready(function () {
+                $('#sellersTable').DataTable({
+                    dom: '<"d-flex justify-content-between mb-3"lfB>rtip', // layout customizado
+                    columnDefs: [
+                        { orderable: false, targets: 4 }
+                    ],
+                         buttons: [
+                                {
+                                    extend: 'excel',
+                                    text: 'Export to Excel',
+                                    className: 'btn btn-success btn-sm'
+                                },
+                                {
+                                    extend: 'pdf',
+                                    text: 'Export to PDF',
+                                    className: 'btn btn-danger btn-sm'
+                                }
+                            ],
+                    pageLength: 5,
+                    lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
+                    lengthChange: true,
+                    info: true,
+                    rowReorder: true,
+                    initComplete: function () {
+                        $('.dataTables_filter input')
+                            .addClass('form-control form-control-sm d-inline-block ms-2')
+                            .attr('placeholder', '🔍 Search...');
+
+                        $('.dataTables_length select')
+                            .addClass('form-select form-select-sm d-inline-block ms-2');
+                    },
+                    drawCallback: function () {
+                        $('.dataTables_paginate .paginate_button')
+                            .addClass('btn btn-sm btn-outline-primary mx-1');
+
+                        $('.dataTables_paginate .paginate_button.current')
+                            .removeClass('btn-outline-primary')
+                            .addClass('btn-primary text-white');
+                    }
+                });
+                $('.select2').select2({
+                placeholder: "Select departments",
+                allowClear: true
+                });
+            });
+            function LimparCampos() {
+                $('#Name').val('');
+                $('#DepartmentIds').val(null).trigger('change');
+                $('#sellersTable').DataTable().column(0).search('').draw();
+        }
+    </script>
+}

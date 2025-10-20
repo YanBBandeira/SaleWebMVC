@@ -26,10 +26,23 @@ namespace SalesWebMVC.Controllers
             _userManager = userManager;
         }
 
-        public async Task<IActionResult> Index()
+        
+        public async Task<IActionResult> Index(string? name, List<int>? departmentIds)
         {
-            var list = await _sellerService.FindAllAsync();
-            return View(list);
+            var sellersQuery = await _sellerService.FindAllAsync();
+
+            if (!string.IsNullOrWhiteSpace(name))
+            {
+                sellersQuery = (List<ApplicationUser>)sellersQuery.Where(u => u.UserFullName.Contains(name));
+            }
+
+            if (departmentIds != null && departmentIds.Any())
+            {
+                sellersQuery = sellersQuery.Where(u => departmentIds.Contains(u.DepartmentId.Value)).ToList();
+            }
+
+            ViewBag.Departments = await _departmentService.FindAllAsync();
+            return View(sellersQuery);
         }
 
 

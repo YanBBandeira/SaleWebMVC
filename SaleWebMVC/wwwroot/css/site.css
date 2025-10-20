@@ -45,3 +45,19 @@ body {
 .form-group {
     margin-bottom: 15px;
 }
+
+
+.select2-container {
+    width: 125% ;
+}
+
+.select2-container--default .select2-results__option {
+    font-size: 0.8rem;
+    padding: 4px 8px;
+}
+
+.select2-container--default .select2-selection--multiple .select2-selection__choice {
+    font-size: 0.8rem;
+    padding: 2px 6px;
+    margin-top: 2px;
+}
