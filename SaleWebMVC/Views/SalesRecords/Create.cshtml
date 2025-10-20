@@ -20,7 +20,7 @@
                     <label asp-for="SalesRecord.DepartmentId" class="control-label">Department</label>
                     <select id="DepartmentId"
                             asp-for="SalesRecord.DepartmentId"
-                            asp-items="@(new SelectList(Model.Departments, "Id", "Name"))"
+                            asp-items="@(new SelectList(Model.Departments, "Id", "Name", Model.SalesRecord.DepartmentId))"
                             class="form-control">
                         <option value="">-- Select the department --</option>
                     </select>
@@ -30,6 +30,7 @@
                     <label asp-for="SalesRecord.SellerId" class="control-label">Seller</label>
                     <select id="SellerId"
                             asp-for="SalesRecord.SellerId"
+                            asp-items="@(new SelectList(Model.Sellers, "Id", "UserFullName", Model.SalesRecord.SellerId))"
                             class="form-control">
                         <option value="">-- Select the Seller --</option>
                     </select>
@@ -106,7 +107,7 @@
                             sellerSelect.append('<option value="">-- Selecione o Vendedor --</option>');
 
                             $.each(sellers, function (index, seller) {
-                                sellerSelect.append('<option value="' + seller.id + '">' + seller.name + '</option>');
+                                sellerSelect.append('<option value="' + seller.id + '">' + seller.userFullName + '</option>');
                             });
                         },
                         error: function () {

@@ -73,9 +73,9 @@ namespace SalesWebMVC.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, ApplicationUser user)
+        public async Task<IActionResult> Edit(string id, SellerFormViewModel model)
         {
-            if (id != user.Id)
+            if (model.Seller.Id != id)
             {
                 return RedirectToAction(nameof(Error), new { message = "Id mismatch" });
             }
@@ -83,7 +83,7 @@ namespace SalesWebMVC.Controllers
             try
             {
                 // Atualiza só os dados extras do seller (não cria usuário, nem altera login/email)
-                await _sellerService.UpdateSellerExtrasAsync(user);
+                await _sellerService.UpdateSellerExtrasAsync(model.Seller);
                 return RedirectToAction(nameof(Index));
             }
             catch (ApplicationException ex)

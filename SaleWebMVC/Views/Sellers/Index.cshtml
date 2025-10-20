@@ -1,0 +1,93 @@
+﻿@model IEnumerable<SalesWebMVC.Models.ApplicationUser>;
+
+@{
+    ViewData["Title"] = "Sellers";
+}
+
+<h1>Sellers</h1>
+
+<!--#region Search accordion-->
+
+<div class="table-primary" id="accordion-search">
+    <div class="card">
+        <div class="card-header">
+            <a class="accordion-button card-title" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                Full search...
+            </a>
+        </div>
+
+        <form id="search-form">
+            <div id="collapseThree" class="accordion-collapse collapse in">
+                <div class="card-body">
+                    <!--#region LINHA 1-->
+                    <div class="row">
+                        <div class="form-group col-md-6 no-padding">
+                            <label class="col-md-4 control-label text-right no-padding" for="Name">Name</label>
+                            <div class="col-md-8">
+                                <input class="form-control" type="text" id="Name" name="Name">
+                            </div>
+                        </div>
+                        <div class="form-group col-md-6 no-padding">
+                            <label class="col-md-4 control-label text-right no-padding" for="s2id_autogen10">Department</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-footer text-right">
+                    <button type="button" class="btn btn-flat btn-labeled" onclick="LimparCampos()" style="margin: 0px 10px;"><span class="btn-label icon fa fa-trash-o"></span>Clean</button>
+                    <button type="submit" class="btn btn-primary btn-labeled btn-flat"><span class="btn-label icon fa fa-filter"></span>Search</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!--#region Table-->
+<div class="card border-primary p-4">
+    <div class="row">
+        <table id="sellersTable" class="table table-bordered table-striped table-hover">
+            <thead>
+                <tr class="table-info">
+                    <th>
+                        @Html.DisplayNameFor(model => model.UserFullName)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Email)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Department)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.SellerStatus)
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr class="@(item.SellerStatus == SalesWebMVC.Models.Enums.SellerStatus.Inactive ? "text-decoration-line-through text-danger" : "")">
+                        <td>
+                            @Html.DisplayFor(modelItem => item.UserFullName)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Email)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Department.Name)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.SellerStatus)
+                        </td>
+                        <td>
+                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-info btn-sm btn-labeled btn-flat">
+                                <span class="btn-label icon fa fa-info-circle"></span>Edit
+                            </a>
+                        </td>
+                    </tr>
+                }
+        </table>
+    </div>
+</div>
+
+

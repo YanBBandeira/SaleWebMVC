@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using NuGet.Protocol.Plugins;
 using SalesWebMVC.Data;
 using SalesWebMVC.Models;
+using SalesWebMVC.Models.Enums;
 using SalesWebMVC.Services.Exceptions;
 using System.Collections.Generic;
 using System.Linq;
@@ -54,30 +55,24 @@ namespace SalesWebMVC.Services
                 throw new ApplicationException("User is not in Seller role.");
             }
 
-            // Atualiza só os campos extras (se vierem preenchidos)
-            if (!string.IsNullOrEmpty(user.UserFullName))
+
+            if (user.SellerStatus.HasValue)
             {
-                userToUpdate.UserFullName = user.UserFullName;
+                userToUpdate.SellerStatus = user.SellerStatus.Value;
             }
 
-            if (user.BirthDate != default(DateTime))
-            {
-                userToUpdate.BirthDate = user.BirthDate;
-            }
-
-            if (user.BaseSalary != 0)
-            {
-                userToUpdate.BaseSalary = user.BaseSalary;
-            }
-
-            if (user.DepartmentId != 0)
+            // Atualiza o departamento se vier preenchido
+            if (user.DepartmentId.HasValue && user.DepartmentId.Value != 0)
             {
                 userToUpdate.DepartmentId = user.DepartmentId;
             }
 
+
             // Atualiza no banco
-            _context.Update(userToUpdate);
+            //_context.Update(userToUpdate);
             await _context.SaveChangesAsync();
+
+          
         }
 
         public async Task<ApplicationUser> FindByIdAsync(string id)

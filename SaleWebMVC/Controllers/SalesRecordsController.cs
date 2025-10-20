@@ -69,7 +69,12 @@ namespace SalesWebMVC.Controllers
             var sales = await _salesRecordService.FindAllByAsync();
             var sellers = await _sellerService.FindAllAsync();
             var departments = await _departmentService.FindAllAsync();
-            var viewModel = new SalesFromViewModel { Sales = sales, Sellers = sellers, Departments = departments };
+            var viewModel = new SalesFromViewModel 
+            {
+                SalesRecord = new SalesRecord(), 
+                Sellers = sellers, 
+                Departments = departments
+            };
 
             return View(viewModel);
         }

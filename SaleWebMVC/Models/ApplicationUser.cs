@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using SalesWebMVC.Models.Enums;
 using System.ComponentModel.DataAnnotations;
 
 namespace SalesWebMVC.Models
@@ -25,6 +26,8 @@ namespace SalesWebMVC.Models
         public Department? Department{ get; set; }
 
         public ICollection<SalesRecord>? SalesRecords { get; set; } = new List<SalesRecord>();
+
+        public SellerStatus? SellerStatus { get; set; } = Enums.SellerStatus.Active;
 
         // Construtores
         public ApplicationUser() { }
