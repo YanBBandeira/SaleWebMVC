@@ -21,13 +21,24 @@ namespace SalesWebMVC.Controllers
             _departmentService = departmentService;
         }
 
-        public async Task<IActionResult> Index(
+        public async Task<IActionResult> Index()
+        {
+            //Pega todos os registros de vendas e retorna como lista
+            var sales = await _salesRecordService.FindAllByAsync();
+
+            // Preparar os dados para manter os filtros na view
+            ViewBag.Departments = await _departmentService.FindAllAsync();
+            ViewBag.Sellers = await _sellerService.FindAllAsync();
+            return View(sales);
+
+        }
+
+        public async Task<IActionResult> Filter(
                  string Seller,
                 List<int> DepartmentIds,
                 DateTime? minDate,
                 DateTime? maxDate,
                 List<SalesStatus> SalesStatusIds)
-
         {
             //Pega todos os registros de vendas e retorna como lista
             var sales = await _salesRecordService.FindAllByAsync();
@@ -62,28 +73,7 @@ namespace SalesWebMVC.Controllers
                 sales = sales.Where(s => s.Date <= maxDate.Value).ToList();
             }
 
-            
-            bool shouldOpenAccordion =
-            !string.IsNullOrEmpty(Seller) ||
-            (DepartmentIds != null && DepartmentIds.Any()) ||
-            minDate.HasValue ||
-            maxDate.HasValue ||
-            (SalesStatusIds != null && SalesStatusIds.Any());
-
-            ViewBag.ShouldOpenAccordion = shouldOpenAccordion;
-
-
-            ViewBag.FilterSeller = Seller;
-            ViewBag.FilterDepartmentIds = DepartmentIds ?? new List<int>();
-            ViewBag.FilterMinDate = maxDate?.ToString("yyyy-MM-dd"); // formato ISO para input type=date
-            ViewBag.FilterMaxDate = minDate?.ToString("yyyy-MM-dd");
-            ViewBag.FilterSalesStatusIds = SalesStatusIds ?? new List<SalesStatus>();
-
-            // Preparar os dados para manter os filtros na view
-            ViewBag.Departments = await _departmentService.FindAllAsync();
-            ViewBag.Sellers = await _sellerService.FindAllAsync();
-            return View(sales);
-
+            return PartialView("_SalesTablePartial", sales);
         }
 
         public async Task<IActionResult> SimpleSearch(DateTime? minDate, DateTime? maxDate)

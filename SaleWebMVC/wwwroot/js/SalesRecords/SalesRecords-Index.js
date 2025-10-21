@@ -1,19 +1,79 @@
 ﻿$(document).ready(function () {
-    const collapseElement = document.getElementById('collapseOne');
+    applyPlugins();
+});
 
-    if (collapseElement) {
-        const shouldOpen = collapseElement.getAttribute('data-open') === 'true';
 
-        if (shouldOpen) {
-            const bsCollapse = new bootstrap.Collapse(collapseElement, {
-                toggle: false
-            });
-            bsCollapse.show();
+$(document).on('click', '#limparCampos', function () {
+    LimparCampos();
+});
+
+$(document).on('submit', '#search-form', function (e) {
+    e.preventDefault(); // Evita o envio padrão do formulário
+
+    const form = $(this);
+    const url = form.attr('action') || window.location.pathname + '/Filter'; // Usa a URL do formulário ou a URL atual
+
+    const data = form.serialize(); // Serializa os dados do formulário
+
+    $.ajax({
+        url: url,
+        type: 'GET',
+        data: data,
+        success: function (partialViewHtml) {
+            $('#salesResults').html(partialViewHtml); // Atualiza a seção de resultados com a Partial View retornada
+            applyPlugins();
+
+            setTimeout(function () {
+                const $table = $('#salesTable');
+
+                if ($table.length) {
+                    $('html, body').animate({
+                        scrollTop: $table.offset().top - 100 // rola até um pouco acima 
+                    }, 400, function () {
+                        $table.focus(); // foco visual
+                    });
+                }
+            }, 100);
+
+        },
+        error: function () {
+            alert('Erro ao buscar os registros de vendas.');
         }
-    }
+    });
+});
 
+// Evento de click para abrir modal de detalhes
+$(document).on('click', '.view-details', function (e) {
+    e.preventDefault();
+
+    const saleId = $(this).data('id');
+
+    $.ajax({
+        url: detailsUrl,//'@Url.Action("Details", "SalesRecords")', // Ajuste o controller se necessário
+        data: { id: saleId },
+        type: 'GET',
+        success: function (result) {
+            $('#detailsModalBody').html(result);
+            $('#detailsModal').modal('show');
+        },
+        error: function () {
+            alert('Erro ao carregar os detalhes.');
+        }
+    });
+});
+
+function LimparCampos() {
+    $('#Seller').val('');
+    $('#minDate').val('');
+    $('#maxDate').val('');
+    $('#DepartmentIds').val(null).trigger('change');
+    $('#salesStatusIds').val(null).trigger('change');
+}
+
+
+function applyPlugins() {
     $('#salesTable').DataTable({
-        dom: '<"d-flex justify-content-between mb-3"lfB>rtip',
+        dom: '<"d-flex justify-content-between mb-6"lfB>rtip',
         buttons: [
             {
                 extend: 'excel',
@@ -53,72 +113,27 @@
         initComplete: function () {
             $('.dataTables_filter input')
                 .addClass('form-control form-control-sm d-inline-block ms-2')
-                .attr('placeholder', '🔍 Buscar...');
+                .attr('placeholder', '🔍 Search...');
 
             $('.dataTables_length select')
                 .addClass('form-select form-select-sm d-inline-block ms-2');
         },
         drawCallback: function () {
             $('.dataTables_paginate .paginate_button')
-                .addClass('btn btn-sm btn-outline-primary mx-1');
+                .addClass('btn btn-sm btn-outline-info mx-1');
 
             $('.dataTables_paginate .paginate_button.current')
-                .removeClass('btn-outline-primary')
+                .removeClass('btn-outline-info')
                 .addClass('btn-primary text-white');
         }
     });
     $('.select2').select2({
-        placeholder: "Select departments",
         allowClear: true,
         width: '150%'
     });
-});
-
-
-
-
-$(function () {
     $("#minDate").datepicker();
     $("#maxDate").datepicker();
-});
-
-
-
-$(document).on('click', '#limparCampos', function () {
-    LimparCampos();
-});
-
-
-// Evento de click para abrir modal de detalhes
-$(document).on('click', '.view-details', function (e) {
-    e.preventDefault();
-
-    const saleId = $(this).data('id');
-
-    $.ajax({
-        url: detailsUrl,//'@Url.Action("Details", "SalesRecords")', // Ajuste o controller se necessário
-        data: { id: saleId },
-        type: 'GET',
-        success: function (result) {
-            $('#detailsModalBody').html(result);
-            $('#detailsModal').modal('show');
-        },
-        error: function () {
-            alert('Erro ao carregar os detalhes.');
-        }
-    });
-});
-
-function LimparCampos() {
-    $('#Seller').val('');
-    $('#minDate').val('');
-    $('#maxDate').val('');
-    $('#DepartmentIds').val(null).trigger('change');
-    $('#salesStatusIds').val(null).trigger('change');
-}
-
-
-
+};
 
 
 

@@ -3,8 +3,6 @@
 
 @{
     ViewData["Title"] = "Sales";
-    // 
-    var selectedStatusList = ViewBag.FilterSalesStatusIds;
 }
 
 <h1>@ViewData["Title"]</h1>
@@ -15,6 +13,12 @@
 
 
 <div class="table-primary" id="accordion-search">
+    <!-- SPINNER -->
+    <div id="loading-spinner" class="spinner-overlay d-none">
+        <div class="spinner-border text-primary" role="status">
+            <span class="spinner-border spinner-border-sm">Loading...</span>
+        </div>
+    </div>
     <div class="card">
         <div class="card-header">
             <button type="button" class="accordion-button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
@@ -22,14 +26,14 @@
             </button>
         </div>
         <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#accordionExample" data-open="@((ViewBag.ShouldOpenAccordion ?? false).ToString().ToLower())" style="">
-            <form id="search-form" method="get">
+            <form id="search-form">
                 <div class="card-body">
                     <!--#region LINHA 1-->
                     <div class="row">
                         <div class="form-group col-md-6 no-padding">
                             <label class="col-md-4 control-label text-right no-padding" for="Seller">Seller</label>
                             <div class="col-lg-10">
-                                <input class="form-control" type="text" id="Seller" name="Seller" placeholder="Inser name" value="@ViewBag.FilterSeller">
+                                <input class="form-control" type="text" id="Seller" name="Seller">
                             </div>
                         </div>
                         <div class="form-group col-md-6 no-padding">
@@ -38,8 +42,7 @@
                                 <select id="DepartmentIds" name="DepartmentIds" multiple class="form-control select2">
                                     @foreach (var dept in ViewBag.Departments as List<Department>)
                                     {
-                                        <option value="@dept.Id" 
-                                        selected="@(ViewBag.FilterDepartmentIds.Contains(dept.Id) ? "selected" : null)">@dept.Name</option>
+                                        <option value="@dept.Id">@dept.Name</option>
                                     }
                                 </select>
                             </div>
@@ -49,14 +52,13 @@
                             <div class="form-group col-md-6 no-padding">
                                 <label for="minDate">Min Date</label>
                                 <div class="col-lg-10">
-                                    <input id="minDate" type="text" name="minDate" class="form-control" value="@ViewBag.FilterMinDate" />
+                                    <input id="minDate" type="text" name="minDate" class="form-control"/>
                                 </div>
                             </div>
                             <div class="form-group col-md-6 no-padding">
                                 <label for="maxDate">Max Date</label>
                                 <div class="col-lg-10">
-                                    <input id="maxDate" type="text" name="maxDate" class="form-control"
-                                           value="@ViewBag.FilterMaxDate" />
+                                    <input id="maxDate" type="text" name="maxDate" class="form-control"/>
 
                                 </div>
                             </div>
@@ -69,8 +71,7 @@
                                     <select id="salesStatusIds" name="SalesStatusIds" multiple class="form-control select2">
                                         @foreach (var sts in Html.GetEnumSelectList<SalesWebMVC.Models.Enums.SalesStatus>())
                                         {
-                                            var enumValue = (SalesWebMVC.Models.Enums.SalesStatus)Enum.Parse(typeof(SalesWebMVC.Models.Enums.SalesStatus), sts.Value);
-                                            <option value="@sts.Value" selected="@(ViewBag.FilterSalesStatusIds.Contains(enumValue) ? "selected" : null)">@sts.Text</option>
+                                            <option value="@sts.Value">@sts.Text</option>
                                         }
                                     </select>
                                 </div>
@@ -89,50 +90,7 @@
 
 
 <div id="salesResults" class="pt-2">
-    @*@await Html.PartialAsync("_allSales", Model)*@
-    <div class="card border-primary p-4">
-        <div class="card-heading text-white bg-success p-2 rounded">
-            <h3 class="card-title">
-                Total sales = $ <strong>@Model.Sum(obj => obj.Amount).ToString("F2")</strong>
-            </h3>
-        </div>
-        <div class="card-body">
-            <table id="salesTable" class="table table-striped table-hover salesTable">
-                <thead>
-                    <tr class="table-info">
-                        <th>@Html.DisplayNameFor(model => model.First().Id)</th>
-                        <th>@Html.DisplayNameFor(model => model.First().Date)</th>
-                        <th>@Html.DisplayNameFor(model => model.First().Seller.UserFullName)</th>
-                        <th>@Html.DisplayNameFor(model => model.First().Seller.Department.Name)</th>
-                        <th>@Html.DisplayNameFor(model => model.First().Amount)</th>
-                        <th>@Html.DisplayNameFor(model => model.First().Status)</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var item in Model)
-                    {
-                        <tr class="table-bordered
-                                @(item.Status.ToString() == "Billed" ? "text-success" : "")
-                                @(item.Status.ToString() == "Canceled" ? "text-decoration-line-through text-danger" : "")">
-                            <td>@item.Id</td>
-                            <td>@item.Date.ToString("dd/MM/yyyy")</td>
-                            <td>@item.Seller.UserFullName</td>
-                            <td>@item.Seller.Department.Name</td>
-                            <td>@item.Amount.ToString("F2")</td>
-                            <td>@item.Status</td>
-                            <td class="text-decoration-none text-center">
-                                <a class="btn btn-primary btn-sm" asp-action="Edit" asp-route-id="@item.Id">Edit</a>
-                                <a asp-action="Details" asp-controller="Sales" asp-route-id="@item.Id" class="btn btn-info btn-sm view-details" data-id="@item.Id" ">Details</a>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-
+    @await Html.PartialAsync("_SalesTablePartial", Model)
 </div>
 
 <!-- Modal para detalhes -->
@@ -154,7 +112,9 @@
 @section Scripts {
     <script>
         window.detailsUrl = '@Url.Action("Details", "SalesRecords")';
+        window.filterUrl = '@Url.Action("")';
     </script>
     <script src="~/js/SalesRecords/SalesRecords-Index.js"
             defer></script>
 }
+
