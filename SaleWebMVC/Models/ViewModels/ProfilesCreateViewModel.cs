@@ -27,7 +27,15 @@ namespace SalesWebMVC.Models.ViewModels
         [Display(Name = "Confirm password")]
         public string ConfirmPassword { get; set; }
 
-        public string Role { get; set; }  
-        
+        public string Role { get; set; }
+
+        [DataType(DataType.Date)]
+        [Display(Name = "Birth Date")]
+        public DateTime? BirthDate { get; set; }
+
+
+        [Display(Name = "Base Salary")]
+        [Range(1.0, 5000000.0, ErrorMessage = "{0} must be from {1} to {2}")]
+        public double? BaseSalary { get; set; }
     }
 }

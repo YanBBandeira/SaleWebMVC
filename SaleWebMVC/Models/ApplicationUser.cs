@@ -27,7 +27,7 @@ namespace SalesWebMVC.Models
 
         public ICollection<SalesRecord>? SalesRecords { get; set; } = new List<SalesRecord>();
 
-        public SellerStatus? SellerStatus { get; set; } = Enums.SellerStatus.Active;
+        public SellerStatus? SellerStatus { get; set; } = Enums.SellerStatus.Inactive;
 
         // Construtores
         public ApplicationUser() { }
