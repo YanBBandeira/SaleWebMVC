@@ -1,0 +1,31 @@
+﻿@model SalesWebMVC.Models.ViewModels.StatsViewModel;
+
+@{
+    ViewData["Title"] = "Sales statistics";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<div id="seller-data"
+     data-labels='@Html.Raw(Json.Serialize(Model.SellerNames))'
+     data-sales='@Html.Raw(Json.Serialize(Model.SellerSales))'
+     data-datelabels='@Html.Raw(Json.Serialize(Model.Labels))'
+     data-datesales='@Html.Raw(Json.Serialize(Model.Sales))'
+>
+</div>
+
+
+<div style="max-width: 800px;">
+    <canvas id="salesChart"></canvas>
+</div>
+
+<h2 class="mt-5">Sales by Seller</h2>
+<div style="max-width: 800px;">
+    <canvas id="sellerChart"></canvas>
+</div>
+
+@section Scripts {
+    <script src="~/js/Stats/Stats-Index.js" defer>
+        
+    </script>
+}
