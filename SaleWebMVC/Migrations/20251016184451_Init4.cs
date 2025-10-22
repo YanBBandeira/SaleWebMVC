@@ -5,7 +5,7 @@
 namespace SalesWebMVC.Migrations
 {
     /// <inheritdoc />
-    public partial class DateTimeUpdate2 : Migration
+    public partial class Init4 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

@@ -1,59 +1,154 @@
-﻿@model IEnumerable<SalesWebMVC.Models.Seller>
+﻿@model IEnumerable<SalesWebMVC.Models.ApplicationUser>;
 
 @{
-    ViewData["Title"] = "Sellers"; 
+    ViewData["Title"] = "Sellers";
 }
 
-<h2>@ViewData["Title"]</h2>
-<p>
-    <a asp-action="Create" class="btn btn-success">Creat New</a>
-</p> 
-<div class="row">
-    <table id="sellersTable" class="table table-striped table-hover">
-        <thead>
-            <tr class="table-bordered table-striped-columns table-responsive-sm table-hover table-primary">
-                <th scope="row">
-                    @Html.DisplayNameFor(model => model.Name)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Email)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.BirthDate)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.BaseSalary)
-                </th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model)
-            {
-                <tr class="table-active">
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Name)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Email)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.BirthDate)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.BaseSalary)
-                    </td>
-                    <td>
-                        <a class="btn btn-sm btn-outline-primary" asp-action="Edit" asp-route-id="@item.Id">Edit</a>
-                        <a class="btn btn-sm btn-outline-info" asp-action="Details" asp-route-id="@item.Id">Details</a>
-                        <a class="btn btn-sm btn-outline-danger" asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+<h1>Sellers</h1>
+
+<!--#region Search accordion-->
+
+<div class="table-primary" id="accordion-search">
+    <div class="card">
+        <div class="card-header">
+            <a class="accordion-button card-title" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                Full search...
+            </a>
+        </div>
+
+        <form id="search-form">
+            <div id="collapseThree" class="accordion-collapse collapse in">
+                <div class="card-body">
+                    <!--#region LINHA 1-->
+                    <div class="row">
+                        <div class="form-group col-md-6 no-padding">
+                            <label class="col-md-4 control-label text-right no-padding" for="Name">Name</label>
+                            <div class="col-md-8">
+                                <input class="form-control" type="text" id="Name" name="Name" placeholder="Inser name">
+                            </div>
+                        </div>
+                        <div class="form-group col-md-6 no-padding">
+                            <label class="col-md-6 control-label text-right no-padding" for="DepartmentIds">Department</label>
+                            <div class="col-md-8">
+                                <select id="DepartmentIds" name="DepartmentIds" multiple class="form-control select2">
+                                    @foreach (var dept in ViewBag.Departments as List<Department>)
+                                    {
+                                        <option value="@dept.Id">@dept.Name</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-footer text-right">
+                        <button type="button" class="btn btn-flat btn-labeled" onclick="LimparCampos()" style="margin: 0px 10px;"><span class="btn-label icon fa fa-trash-o"></span>Clean</button>
+                        <button type="submit" class="btn btn-primary btn-labeled btn-flat"><span class="btn-label icon fa fa-filter"></span>Search</button>
+                    </div>
+                </div>
+        </form>
+    </div>
 </div>
 
-@section Scripts {
-    <script src="~/js/Sellers/Sellers-Index.js" defer></script>
+<!--#region Table-->
+<div class="card border-primary p-4">
+    <div class="row">
+        <table id="sellersTable" class="table table-bordered table-striped table-hover">
+            <thead>
+                <tr class="table-info">
+                    <th>
+                        @Html.DisplayNameFor(model => model.UserFullName)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Email)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Department)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.SellerStatus)
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr class="@(item.SellerStatus == SalesWebMVC.Models.Enums.SellerStatus.Inactive ? "text-decoration-line-through text-danger" : "")">
+                        <td>
+                            @Html.DisplayFor(modelItem => item.UserFullName)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Email)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Department.Name)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.SellerStatus)
+                        </td>
+                        <td>
+                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-info btn-sm btn-labeled btn-flat">
+                                <span class="btn-label icon fa fa-info-circle"></span>Edit
+                            </a>
+                        </td>
+                    </tr>
+                }
+        </table>
+    </div>
+</div>
+
+
+@section scripts {
+    <script>
+            $(document).ready(function () {
+                $('#sellersTable').DataTable({
+                    dom: '<"d-flex justify-content-between mb-3"lfB>rtip', // layout customizado
+                    columnDefs: [
+                        { orderable: false, targets: 4 }
+                    ],
+                         buttons: [
+                                {
+                                    extend: 'excel',
+                                    text: 'Export to Excel',
+                                    className: 'btn btn-success btn-sm'
+                                },
+                                {
+                                    extend: 'pdf',
+                                    text: 'Export to PDF',
+                                    className: 'btn btn-danger btn-sm'
+                                }
+                            ],
+                    pageLength: 5,
+                    lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
+                    lengthChange: true,
+                    info: true,
+                    rowReorder: true,
+                    initComplete: function () {
+                        $('.dataTables_filter input')
+                            .addClass('form-control form-control-sm d-inline-block ms-2')
+                            .attr('placeholder', '🔍 Search...');
+
+                        $('.dataTables_length select')
+                            .addClass('form-select form-select-sm d-inline-block ms-2');
+                    },
+                    drawCallback: function () {
+                        $('.dataTables_paginate .paginate_button')
+                            .addClass('btn btn-sm btn-outline-primary mx-1');
+
+                        $('.dataTables_paginate .paginate_button.current')
+                            .removeClass('btn-outline-primary')
+                            .addClass('btn-primary text-white');
+                    }
+                });
+                $('.select2').select2({
+                placeholder: "Select departments",
+                allowClear: true
+                });
+            });
+            function LimparCampos() {
+                $('#Name').val('');
+                $('#DepartmentIds').val(null).trigger('change');
+                $('#sellersTable').DataTable().column(0).search('').draw();
+        }
+    </script>
 }

@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using SalesWebMVC.Models;
 using SalesWebMVC.Models.ViewModels;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace SalesWebMVC.Controllers
@@ -34,7 +35,8 @@ namespace SalesWebMVC.Controllers
                 userList.Add(new ProfilesIndexViewModel
                 {
                     Id = user.Id,
-                    Name = user.UserName,
+                    Login = user.UserName,
+                    Name = user.UserFullName,
                     Email = user.Email,
                     Role = roles.FirstOrDefault().ToString() ?? "None"
                 });
@@ -48,6 +50,8 @@ namespace SalesWebMVC.Controllers
         public IActionResult Create()
         {
             ViewBag.Roles = _roleManager.Roles.Select(r => r.Name).ToList();
+            // Exemplo: pega a primeira role do usuário
+            ViewBag.UserRole = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
             return View();
         }
 
@@ -66,7 +70,9 @@ namespace SalesWebMVC.Controllers
                 UserName = model.Name,
                 UserFullName = model.FullName,
                 Email = model.Email,
-                EmailConfirmed = true
+                EmailConfirmed = true,
+                BirthDate = model.BirthDate,
+                BaseSalary = model.BaseSalary
             };
 
             var result = await _userManager.CreateAsync(user, model.Password);
@@ -105,12 +111,15 @@ namespace SalesWebMVC.Controllers
                 Name = user.UserName,
                 FullName = user.UserFullName,
                 Email = user.Email,
-                Role = (await _userManager.GetRolesAsync(user)).FirstOrDefault() ?? "None"
+                Role = (await _userManager.GetRolesAsync(user)).FirstOrDefault() ?? "None",
+                BirthDate = user.BirthDate,
+                BaseSalary = user.BaseSalary
             };
 
             var currentUserId = _userManager.GetUserId(User);
             ViewBag.CurrentUserId = currentUserId;
             ViewBag.Roles = _roleManager.Roles.Select(r => r.Name).ToList();
+            ViewBag.UserRole = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
             return View(model);
         }
 
@@ -153,6 +162,8 @@ namespace SalesWebMVC.Controllers
             user.UserName = model.Name;
             user.UserFullName = model.FullName;
             user.Email = model.Email;
+            user.BirthDate = model.BirthDate;
+            user.BaseSalary = model.BaseSalary;
 
             // Atualizar roles corretamente
             var currentRoles = await _userManager.GetRolesAsync(user); // Pega as roles atuais do usuário

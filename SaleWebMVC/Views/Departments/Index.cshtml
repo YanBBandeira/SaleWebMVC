@@ -29,9 +29,9 @@
                             @Html.DisplayFor(modelItem => item.Name)
                         </td>
                         <td class="text-end">
-                            <a class="btn btn-sm btn-outline-info" asp-action="Edit" asp-route-id="@item.Id"> <i class="bi bi-pencil-square"></i></a>
-                            <a class="btn btn-sm btn-outline-info" asp-action="Details" asp-route-id="@item.Id"> <i class="bi bi-eye"></i></a>
-                            <a class="btn btn-sm btn-outline-info" asp-action="Delete" asp-route-id="@item.Id"> <i class="bi bi-trash"></i></a>
+                            <a class="btn btn-sm btn-info" asp-action="Edit" asp-route-id="@item.Id"> <i class="bi bi-pencil-square"></i></a>
+                            <a class="btn btn-sm btn-info" asp-action="Details" asp-route-id="@item.Id"> <i class="bi bi-eye"></i></a>
+                            <a class="btn btn-sm btn-danger" asp-action="Delete" asp-route-id="@item.Id"> <i class="bi bi-trash"></i></a>
                         </td>
                     </tr>
                 }
@@ -42,5 +42,5 @@
 
 
 @section Scripts {
-    <script src="Scripts/Departments-Index.js" defer></script>
+    <script src="~/js/Departments/Departments-Index.js" defer></script>
 }

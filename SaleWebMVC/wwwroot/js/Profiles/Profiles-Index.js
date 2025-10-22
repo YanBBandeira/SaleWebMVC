@@ -1,10 +1,16 @@
 ﻿$(document).ready(function () {
+    applyPlugins();
+});
+
+
+function applyPlugins() {
     $('#usersTable').DataTable({
         dom: '<"d-flex justify-content-between mb-3"lfB>rtip', // layout customizado
+        buttons: [],
         columnDefs: [
-            { orderable: false, targets: 3 }
+            { orderable: false, targets: 4 }
         ],
-        pageLength: 10,
+        pageLength: 5,
         lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
         lengthChange: true,
         info: true,
@@ -26,6 +32,4 @@
                 .addClass('btn-primary text-white');
         }
     });
-});
-
-
+};

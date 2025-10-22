@@ -11,8 +11,9 @@ namespace SalesWebMVC.Models
 
         [Required(ErrorMessage = "{0} required")]
         [StringLength(60, MinimumLength = 2, ErrorMessage = "{0} size should be between {1} and {2}")]
+        [Display(Name="Department")]
         public string Name { get; set; }
-        public ICollection<Seller> Sellers { get; set; } = new List<Seller>();
+        public ICollection<ApplicationUser> Sellers { get; set; } = new List<ApplicationUser>();
 
         public Department() { }
         public Department(int id, string name)
@@ -21,16 +22,12 @@ namespace SalesWebMVC.Models
             Name = name;
         }
 
-
-        public void AddSeller(Seller seller) 
-        {
-            Sellers.Add(seller);
-        }
-
         public double TotalSales(DateTime initialDate, DateTime endDate)
         {
-            return (from p in Sellers select p.TotalSales(initialDate, endDate)).Sum();
+            return Sellers
+                .SelectMany(s => s.SalesRecords) // acessa as vendas do usuário
+                .Where(sr => sr.Date >= initialDate && sr.Date <= endDate)
+                .Sum(sr => sr.Amount);
         }
-
     }
 }
