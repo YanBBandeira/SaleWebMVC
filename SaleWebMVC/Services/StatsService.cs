@@ -1,4 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using NuGet.ProjectModel;
 using SalesWebMVC.Data;
 using SalesWebMVC.Models;
 using SalesWebMVC.Models.ViewModels;
@@ -15,39 +17,85 @@ namespace SalesWebMVC.Services
             _context = context;
         }
 
-        public async Task<StatsViewModel> GetSalesByMonthAsync()
+        public async Task<StatsViewModel> GetStatsAsync(StatsFilterViewModel? filter)
         {
-            var salesByMonth = await _context.SalesRecords
-                .GroupBy(s => new { s.Date.Year, s.Date.Month })
-                .Select(g => new
+            var salesQuery = _context.SalesRecords.AsQueryable();
+
+            if(filter != null)
+            {
+                // Aplica os filtros
+                if (filter.StartDate.HasValue)
                 {
-                    Month = g.Key.Month,
-                    Year = g.Key.Year,
-                    Total = g.Sum(s => s.Amount)
+                    salesQuery = salesQuery.Where(s => s.Date >= filter.StartDate.Value);
+                }
+                if (filter.EndDate.HasValue)
+                {
+                    salesQuery = salesQuery.Where(s => s.Date <= filter.EndDate.Value);
+                }
+                if (filter.DepartmentId.HasValue)
+                {
+                    salesQuery = salesQuery.Where(s => s.DepartmentId == filter.DepartmentId.Value);
+                }
+                if (!string.IsNullOrEmpty(filter.SellerId))
+                {
+                    salesQuery = salesQuery.Where(s => s.SellerId == filter.SellerId);
+                }
+            }
+
+
+            // seleciona a lista por mês
+            var SalesByMonth = await salesQuery
+                .GroupBy(s => new
+                {
+                    s.Date.Year,
+                    s.Date.Month
                 })
-                .OrderBy(g => g.Year).ThenBy(g => g.Month)
+                .Select(s => new
+                {
+                    Year = s.Key.Year,
+                    Month = s.Key.Month,
+                    Total = s.Sum(s => s.Amount)
+                })
                 .ToListAsync();
 
-            // Vendas por vendedor
-            var salesBySeller = await _context.SalesRecords
-                .Where(x => x.Status != SalesWebMVC.Models.Enums.SalesStatus.Canceled)
-                .Include(s => s.Seller)
+       
+            var monthLabels = SalesByMonth
+                .Select(x => $"{x.Month:D2}/{x.Year}")  // Exemplo: "04/2025"
+                .ToList();
+
+            var monthSales = SalesByMonth
+                .Select(x => x.Total)
+                .ToList();
+
+
+            // Seleciona a lista por vendedor
+            var salesBySeller = await salesQuery
                 .GroupBy(s => s.Seller.UserFullName)
-                .Select(g => new {
-                    Seller = g.Key,
+                .Select(g => new
+                {
+                    SellerName = g.Key,
                     Total = g.Sum(s => s.Amount)
                 })
                 .OrderByDescending(g => g.Total)
                 .ToListAsync();
 
-            return new StatsViewModel
+            var sellerNames = salesBySeller.Select(x => x.SellerName).ToList();
+            var sellerSales = salesBySeller.Select(x => x.Total).ToList();
+
+            var result = new StatsViewModel
             {
-                Labels = salesByMonth.Select(x => $"{CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedMonthName(x.Month)}/{x.Year}").ToList(),
-                Sales = salesByMonth.Select(x => x.Total).ToList(),
-                SellerNames = salesBySeller.Select(x => x.Seller).ToList(),
-                SellerSales = salesBySeller.Select(x => x.Total).ToList()
+                SalesByMonth = new SalesByMonthViewModel
+                {
+                    MonthLabels = monthLabels,
+                    MonthSales = monthSales
+                },
+                SalesBySeller = new SalesBySellerViewModel
+                {
+                    SellerNames = sellerNames,
+                    SellerSales = sellerSales
+                }
             };
-            
+            return result;
         }
     }
 }

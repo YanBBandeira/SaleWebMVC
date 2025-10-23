@@ -2,13 +2,8 @@
 {
     public class StatsViewModel
     {
-
         public SalesByMonthViewModel SalesByMonth { get; set; }
         public SalesBySellerViewModel SalesBySeller { get; set; }
-
-        public StatsFilterViewModel Filter { get; set; }
-
-
     }
 
     public class SalesByMonthViewModel
@@ -29,8 +24,6 @@
         public DateTime? EndDate { get; set; }
 
         public int? DepartmentId { get; set; }
-        public int? SellerId { get; set; }
-
-        // Adicione mais filtros conforme necessidade
+        public string? SellerId { get; set; }
     }
 }

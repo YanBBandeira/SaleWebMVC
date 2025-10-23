@@ -4,28 +4,105 @@
     ViewData["Title"] = "Sales statistics";
 }
 
-<h1>@ViewData["Title"]</h1>
+<h1 class="text-primary-emphasis">@ViewData["Title"]</h1>
+<hr />
 
+<!--data-->
 <div id="seller-data"
-     data-labels='@Html.Raw(Json.Serialize(Model.SellerNames))'
-     data-sales='@Html.Raw(Json.Serialize(Model.SellerSales))'
-     data-datelabels='@Html.Raw(Json.Serialize(Model.Labels))'
-     data-datesales='@Html.Raw(Json.Serialize(Model.Sales))'
->
+     data-labels='@Html.Raw(Json.Serialize(Model.SalesBySeller.SellerNames))'
+     data-sales='@Html.Raw(Json.Serialize(Model.SalesBySeller.SellerSales))'
+     data-datelabels='@Html.Raw(Json.Serialize(Model.SalesByMonth.MonthLabels))'
+     data-datesales='@Html.Raw(Json.Serialize(Model.SalesByMonth.MonthSales))'>
+</div>
+<!--region-->
+<!--Filter accordion-->
+<div class="card">
+    <div class="card-header">
+        <button type="button" class="accordion-button" data-bs-toggle="collapse" data-bs-target="#collapseDiv" aria-expanded="false" aria-controls="collapseDiv">
+            Filter
+        </button>
+    </div>
+    <div id="collapseDiv" class="accordion-collapse collapse" aria-labelledby="headingOne">
+        <form id="filter-form">
+            <div class="card-body">
+                <!--Linha 1-->
+                <div class="row">
+                    <div class="form-group col-md-6">
+                        <label class="col-md-4 control-label" for="sellerIds">Seller</label>
+                        <div class="col-md-6">
+                            <select id="sellerIds" name="sellerIds" multiple class="form-control select2">
+                                @foreach (var seller in ViewBag.Sellers as List<ApplicationUser>)
+                                {
+                                    <option value="@seller.Id" selected>@seller.UserFullName</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label class="col-md-4 control-label" for="departmentIds">Department</label>
+                        <div class="col-md-6">
+                            <select id="departmentIds" name="departmentIds" multiple class="form-control select2">
+                                @foreach (var dept in ViewBag.Departments as List<Department>)
+                                {
+                                    <option value="@dept.Id">@dept.Name</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <!--Linha 2-->
+                <div class="row">
+                    <div class="form-group col-md-6">
+                        <label for="minDate">Min Date</label>
+                        <div class="col-lg-4">
+                            <input id="minDate" type="text" name="minDate" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="maxDate">Max Date</label>
+                        <div class="col-lg-4">
+                            <input id="maxDate" type="text" name="maxDate" class="form-control" />
+                        </div>
+                    </div>
+                </div>
+                <!--Linha 3-->
+                <div class="row">
+                    <div class="form-group col-md-6">
+                    </div>
+                    <div class="form-group col-md-6">
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer text-end">
+                <button id="limparCampos" type="button" class="btn btn-flat btn-labeled">Clear</button>
+                <button type="submit" class="btn btn-primary"><span class="btn-label icon-link fa fa-filter"></span>Filter</button>
+            </div>
+        </form>
+    </div>
 </div>
 
 
-<div style="max-width: 800px;">
-    <canvas id="salesChart"></canvas>
+<!--Graphs-->
+<div class="container-fluid row">
+    <div class="col-md-6">
+        <div style="max-width: 800px;">
+            <h2 class="mt-5">Sales by Month</h2>
+            <canvas id="salesChart"></canvas>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <h2 class="mt-5">Sales by Seller</h2>
+        <div style="max-width: 800px;">
+            <canvas id="sellerChart"></canvas>
+        </div>
+    </div>
 </div>
 
-<h2 class="mt-5">Sales by Seller</h2>
-<div style="max-width: 800px;">
-    <canvas id="sellerChart"></canvas>
-</div>
+
+
+
 
 @section Scripts {
     <script src="~/js/Stats/Stats-Index.js" defer>
-        
     </script>
 }
