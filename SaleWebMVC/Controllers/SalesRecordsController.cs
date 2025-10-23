@@ -34,7 +34,7 @@ namespace SalesWebMVC.Controllers
         }
 
         public async Task<IActionResult> Filter(
-                 string Seller,
+                string Seller,
                 List<int> DepartmentIds,
                 DateTime? minDate,
                 DateTime? maxDate,
