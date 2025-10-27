@@ -20,13 +20,16 @@ document.addEventListener("DOMContentLoaded", function () {
     const monthLabels = JSON.parse(dataElement.dataset.monthlabels);
     const sellerLabels = JSON.parse(dataElement.dataset.sellerlabels);
     const statusLabels = JSON.parse(dataElement.dataset.statuslabels);
+    const deptLabels = JSON.parse(dataElement.dataset.deptlabels);
+
     const salesByMonth = JSON.parse(dataElement.dataset.salesbymonth);
     const salesBySeller = JSON.parse(dataElement.dataset.salesbyseller);
+    const salesByDept = JSON.parse(dataElement.dataset.salesbydept);
 
     const statusTotals = JSON.parse(dataElement.dataset.statustotals);
 
-    console.log(salesByMonth)
-
+    console.log(salesByDept);
+    //console.log(dataElement.dataset);
 
     // Paleta de cores
     const colors = [
@@ -115,6 +118,41 @@ document.addEventListener("DOMContentLoaded", function () {
         options: {
             plugins: {
                 title: { display: true, text: " 📈 Sales by Seller" }
+            },
+            responsive: true,
+            scales: {
+                x: { stacked: true },
+                y: { stacked: true, beginAtZero: true }
+            }
+        }
+    });
+    //#endregion
+
+
+    //#region --- 👤 Sales by Department ---
+    function buildDeptDatasets(statusLabels, salesData) {
+        return statusLabels.map((status, i) => ({
+            label: status,
+            data: salesData[status] || [],
+            borderColor: colors[i % colors.length],
+            backgroundColor: colors[i % colors.length].replace("1)", "0.7)"),
+            fill: true,
+            tension: 0
+        }));
+    }
+
+
+    const ctxDept = document.getElementById("salesByDeptChart").getContext("2d");
+
+    new Chart(ctxDept, {
+        type: "bar",
+        data: {
+            labels: deptLabels,
+            datasets: buildSellerDatasets(statusLabels, salesByDept)
+        },
+        options: {
+            plugins: {
+                title: { display: true, text: " 📈 Sales by Department" }
             },
             responsive: true,
             scales: {

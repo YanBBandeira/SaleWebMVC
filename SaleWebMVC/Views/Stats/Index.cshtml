@@ -21,8 +21,10 @@
      data-monthlabels='@Html.Raw(Json.Serialize(Model.SalesByMonth.MonthLabels))'
      data-sellerlabels='@Html.Raw(Json.Serialize(Model.SalesBySeller.SellerLabels))'
      data-statuslabels='@Html.Raw(Json.Serialize(Model.SalesByMonth.StatusLabel))'
+     data-deptlabels='@Html.Raw(Json.Serialize(Model.SalesByDepartment.DepartmentLabels))'
      data-salesbymonth='@Html.Raw(Json.Serialize(Model.SalesByMonth.SalesPerStatus))'
      data-salesbyseller='@Html.Raw(Json.Serialize(Model.SalesBySeller.SalesPerStatus))'
+     data-salesbydept='@Html.Raw(Json.Serialize(Model.SalesByDepartment.SalesPerStatus))'
      data-statustotals='@Html.Raw(Json.Serialize(
         Model.SalesByStatus.SalesPerStatus ))'
 >
@@ -134,10 +136,17 @@
     </div>
 </div>
 
+<hr />
+
+<div class="d-lg-inline">
+    <h3 class="text-primary-emphasis">
+        Sellers table
+    </h3>
+</div>
 
 
 <div class="card m-5">
-    <div class="card-body row">
+    <div class="card-body">
         <table id="sellerTable" class="table table-hover">
             <thead>
                 <tr class="table-primary">
@@ -151,8 +160,8 @@
             </thead>
             <tbody>
                 @for (int i = 0; i < Model.SalesBySeller.SellerLabels.Count; i++)
-                    {
-                    <tr>
+                    {totalValue = 0;
+                    <tr >
                         <td>@Model.SalesBySeller.SellerLabels[i]</td>
                         @foreach (var status in Model.SalesBySeller.StatusLabel)
                         {
@@ -169,6 +178,52 @@
     </div>
 </div>
 
+<hr />
+<div class="container mt-5">
+    <div class="col-md-12">
+        <h4 class="mb-2"> Sales by Department</h4>
+        <canvas id="salesByDeptChart"></canvas>
+    </div>
+</div>
+
+<div class="d-lg-inline mx-5">
+    <h3 class="text-primary-emphasis">
+        Department table
+    </h3>
+</div>
+
+<div class="card m-5">
+    <div class="card-body">
+        <table id="deptTable" class="table table-hover">
+            <thead>
+                <tr class="table-primary">
+                    <td>Seller</td>
+                    @foreach (var status in Model.SalesByDepartment.StatusLabel)
+                    {
+                        <th>@status</th>
+                    }
+                    <td>Total</td>
+                </tr>
+            </thead>
+            <tbody>
+                @for (int i = 0; i < Model.SalesByDepartment.DepartmentLabels.Count; i++)
+                    {totalValue = 0;
+                    <tr >   
+                        <td>@Model.SalesByDepartment.DepartmentLabels[i]</td>
+                        @foreach (var status in Model.SalesByDepartment.StatusLabel)
+                        {
+                            var value = Model.SalesByDepartment.SalesPerStatus[status][i];
+                            totalValue += value;
+                            <td>@value.ToString("C")</td> <!-- mostra formatado em R$ -->
+                        
+                        }
+                        <td>@totalValue.ToString("C")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
 
 
 
