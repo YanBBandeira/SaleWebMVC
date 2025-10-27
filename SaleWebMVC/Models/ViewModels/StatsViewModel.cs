@@ -7,6 +7,7 @@ namespace SalesWebMVC.Models.ViewModels
         public SalesByMonthViewModel SalesByMonth { get; set; }
         public SalesBySellerViewModel SalesBySeller { get; set; }
         public SalesByStatusViewModel SalesByStatus { get; set; }
+        public SalesByDepartmentViewModel SalesByDepartment { get; set; }
     }
 
     public class SalesByStatusViewModel
@@ -26,6 +27,13 @@ namespace SalesWebMVC.Models.ViewModels
     public class SalesBySellerViewModel
     {
         public List<string> SellerLabels { get; set; }
+        public List<string> StatusLabel { get; set; }
+        public Dictionary<string, List<double>> SalesPerStatus { get; set; } // Dictioney of sales per status
+    }
+
+    public class SalesByDepartmentViewModel
+    {
+        public List<string> DepartmentLabels { get; set; }
         public List<string> StatusLabel { get; set; }
         public Dictionary<string, List<double>> SalesPerStatus { get; set; } // Dictioney of sales per status
     }

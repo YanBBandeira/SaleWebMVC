@@ -166,7 +166,45 @@ namespace SalesWebMVC.Services
                 x => new List<double> { x.Total } // valor = lista com 1 elemento
                 );
 
+            var SalesByDepartmentStatus = await salesQuery
+                .GroupBy(s => new
+                {
+                    DepartmentName = s.Seller.Department.Name,
+                    s.Status
+                })
+                .Select(g => new
+                {
+                    DepartmentName = g.Key.DepartmentName,
+                    Status = g.Key.Status,
+                    Total = g.Sum(s => s.Amount)
+                })
+                .ToListAsync();
 
+            var statusLabelsByDepartment = SalesByDepartmentStatus
+                .Select(x => x.Status.ToString())
+                .Distinct()
+                .ToList();
+
+            var departmentLabels = SalesByDepartmentStatus
+                .Select(x => x.DepartmentName)
+                .Distinct()
+                .ToList();
+
+            //Monta o dicionário de vendas por mês por status
+            var salesPerStatusByDepartment = new Dictionary<string, List<double>>();
+
+            foreach (var status in statusLabelsByDepartment)
+            {
+                var list = new List<double>();
+                foreach (var dept in departmentLabels)
+                {
+                    var total = SalesByDepartmentStatus
+                        .Where(x => x.Status.ToString() == status && x.DepartmentName == dept)
+                        .Sum(x => x.Total);
+                    list.Add(total);
+                }
+                salesPerStatusByDepartment[status] = list;
+            }
 
             var result = new StatsViewModel
             {
@@ -186,6 +224,12 @@ namespace SalesWebMVC.Services
                 {
                     StatusLabel = statusLabels.Select(s => s.ToString()).ToList(),
                     SalesPerStatus = salesPerStatus
+                },
+                SalesByDepartment = new SalesByDepartmentViewModel
+                {
+                    DepartmentLabels = departmentLabels,
+                    StatusLabel = statusLabelsByDepartment,
+                    SalesPerStatus = salesPerStatusByDepartment
                 }
             };
             return result;
