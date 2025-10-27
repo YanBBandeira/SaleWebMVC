@@ -3,8 +3,10 @@ using Microsoft.IdentityModel.Tokens;
 using NuGet.ProjectModel;
 using SalesWebMVC.Data;
 using SalesWebMVC.Models;
+using SalesWebMVC.Models.Enums;
 using SalesWebMVC.Models.ViewModels;
 using System.Globalization;
+using System.Linq;
 
 namespace SalesWebMVC.Services
 {
@@ -21,7 +23,7 @@ namespace SalesWebMVC.Services
         {
             var salesQuery = _context.SalesRecords.AsQueryable();
 
-            if(filter != null)
+            if (filter != null)
             {
                 // Aplica os filtros
                 if (filter.StartDate.HasValue)
@@ -43,56 +45,147 @@ namespace SalesWebMVC.Services
             }
 
 
-            // seleciona a lista por mês
-            var SalesByMonth = await salesQuery
+            // Agrupa vendas por mês e status e já ordena
+            var SalesByMonthStatus = await salesQuery
                 .GroupBy(s => new
                 {
                     s.Date.Year,
-                    s.Date.Month
+                    s.Date.Month,
+                    s.Status
                 })
                 .Select(s => new
                 {
                     Year = s.Key.Year,
                     Month = s.Key.Month,
+                    Status = s.Key.Status,
                     Total = s.Sum(s => s.Amount)
                 })
+                .OrderBy(g => g.Year)
+                .ThenBy(g => g.Month)
                 .ToListAsync();
 
-       
-            var monthLabels = SalesByMonth
+            // Gera lista de labels únicas de mês no formato "MM/yyyy"
+            var monthLabels = SalesByMonthStatus
                 .Select(x => $"{x.Month:D2}/{x.Year}")  // Exemplo: "04/2025"
+                .Distinct()
                 .ToList();
 
-            var monthSales = SalesByMonth
-                .Select(x => x.Total)
+            // Lista de status para exibir no gráfico
+            var statusListByMonth = SalesByMonthStatus
+                .Select(x => x.Status.ToString())
+                .Distinct()
                 .ToList();
+
+            // Cria um lookup rápido: chave = (Status, MM/yyyy)
+            var lookup = SalesByMonthStatus
+                .ToDictionary(
+                    x => (Status: x.Status.ToString(), Label: $"{x.Month:D2}/{x.Year}"),
+                    x => x.Total
+                );
+
+            // Monta o dicionário de vendas por mês por status
+            var salesPerStatusByMonth = statusListByMonth.ToDictionary(
+                status => status,
+                status => monthLabels
+                    .Select(label => lookup.TryGetValue((status, label), out var total) ? total : 0.0)
+                    .ToList()
+            );
+
+
+
+
+
 
 
             // Seleciona a lista por vendedor
-            var salesBySeller = await salesQuery
-                .GroupBy(s => s.Seller.UserFullName)
+            var SalesBySellerStatus = await salesQuery
+                .GroupBy(s => new
+                {
+                    s.Seller.UserFullName,
+                    s.Status
+                })
                 .Select(g => new
                 {
-                    SellerName = g.Key,
+                    SellerName = g.Key.UserFullName,
+                    Status = g.Key.Status,
                     Total = g.Sum(s => s.Amount)
                 })
-                .OrderByDescending(g => g.Total)
                 .ToListAsync();
 
-            var sellerNames = salesBySeller.Select(x => x.SellerName).ToList();
-            var sellerSales = salesBySeller.Select(x => x.Total).ToList();
+            var sellerLabels = SalesBySellerStatus
+                .Select(x => x.SellerName)
+                .Distinct()
+                .ToList();
+
+
+            // Pega os status distintos
+            var statusListBySeller = SalesByMonthStatus
+                .Select(x => x.Status.ToString())
+                .Distinct()
+                .ToList();
+
+            // Monta o dicionário de vendas por mês por status
+            var salesPerStatusBySeller = new Dictionary<string, List<double>>();
+
+            foreach (var status in statusListBySeller)
+            {
+                var list = new List<double>();
+                foreach (var seller in sellerLabels)
+                {
+                    var total = SalesBySellerStatus
+                        .Where(x => x.Status.ToString() == status && x.SellerName == seller)
+                        .Sum(x => x.Total);
+                    list.Add(total);
+                }
+                salesPerStatusBySeller[status.ToString()] = list;
+            }
+
+
+
+            // Agrupa vendas por status e soma os valores
+            var SalesByStatus = await salesQuery
+                .GroupBy(s => s.Status)
+                .Select(g => new
+                {
+                    Status = g.Key,
+                    Total = g.Sum(s => s.Amount)
+                })
+                .ToListAsync();
+
+            // Lista de status para exibir no gráfico
+            var statusLabels = SalesByStatus
+                .Select(x => x.Status)
+                .Distinct()
+                .ToList();
+
+
+            // Monta o dicionário de vendas por status
+            var salesPerStatus = SalesByStatus
+                .ToDictionary(
+                x => x.Status.ToString(),    // chave = nome do status
+                x => new List<double> { x.Total } // valor = lista com 1 elemento
+                );
+
+
 
             var result = new StatsViewModel
             {
                 SalesByMonth = new SalesByMonthViewModel
                 {
                     MonthLabels = monthLabels,
-                    MonthSales = monthSales
+                    StatusLabel = statusListByMonth,
+                    SalesPerStatus = salesPerStatusByMonth
                 },
                 SalesBySeller = new SalesBySellerViewModel
                 {
-                    SellerNames = sellerNames,
-                    SellerSales = sellerSales
+                    SellerLabels = sellerLabels,
+                    StatusLabel = statusListBySeller,
+                    SalesPerStatus = salesPerStatusBySeller
+                },
+                SalesByStatus = new SalesByStatusViewModel
+                {
+                    StatusLabel = statusLabels.Select(s => s.ToString()).ToList(),
+                    SalesPerStatus = salesPerStatus
                 }
             };
             return result;
