@@ -1,7 +1,7 @@
 ﻿@model SalesWebMVC.Models.ViewModels.StatsViewModel;
 
 @{
-    ViewData["Title"] = "Sales statistics";
+    ViewData["Title"] = "Sales DashBoard";
     double totalValue = 0; // inicializa antes do loop
     var orderedStatuses = new List<string> { "Billed", "Pending", "Canceled" };
     var statusColors = new Dictionary<string, string>
@@ -12,7 +12,16 @@
     };
 }
 
-<h1 class="text-primary-emphasis">@ViewData["Title"]</h1>
+
+<div class="row">
+    <div class="col-md-8">
+        <h1 class="text-primary-emphasis">@ViewData["Title"]</h1>
+    </div>
+    <div class="col-4">
+        <a asp-action="Index" class="btn btn-lg btn-secondary float-end">Back</a>
+    </div>
+</div>
+
 <hr />
 
 
