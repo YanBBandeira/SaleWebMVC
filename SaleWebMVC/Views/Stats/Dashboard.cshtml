@@ -1,0 +1,164 @@
+﻿@model SalesWebMVC.Models.ViewModels.StatsViewModel;
+
+@{
+    ViewData["Title"] = "Sales statistics";
+    double totalValue = 0; // inicializa antes do loop
+    var orderedStatuses = new List<string> { "Billed", "Pending", "Canceled" };
+    var statusColors = new Dictionary<string, string>
+    {
+        {"Billed", "bg-success"},
+        {"Pending", "bg-primary"},
+        {"Canceled", "bg-danger"},
+    };
+}
+
+<h1 class="text-primary-emphasis">@ViewData["Title"]</h1>
+<hr />
+
+
+<!-- 🔹 Dados do gráfico -->
+<div>
+    <script id="chart-data" type="application/json">
+@Html.Raw(Json.Serialize(new {
+    MonthLabels = Model.SalesByMonth.MonthLabels ?? new List<string>(),
+    SellerLabels = Model.SalesBySeller.SellerLabels ?? new List<string>(),
+    StatusLabels = Model.SalesByMonth.StatusLabel ?? new List<string>(),
+    DeptLabels = Model.SalesByDepartment.DepartmentLabels ?? new List<string>(),
+    SalesByMonth = Model.SalesByMonth.SalesPerStatus ?? new Dictionary<string, List<double>>(),
+    SalesBySeller = Model.SalesBySeller.SalesPerStatus ?? new Dictionary<string, List<double>>(),
+    SalesByDept = Model.SalesByDepartment.SalesPerStatus ?? new Dictionary<string, List<double>>(),
+    StatusTotals = Model.SalesByStatus.SalesPerStatus ?? new Dictionary<string, List<double>>()
+}))
+</script>
+</div>
+
+<div class="row mb-4 flex-fill" id="statusSummary">
+    @foreach (var status in orderedStatuses)
+    {
+        if (Model.SalesByStatus.SalesPerStatus.ContainsKey(status))
+        {
+            var total = Model.SalesByStatus.SalesPerStatus[status].Sum();
+            var colorClass = statusColors.ContainsKey(status) ? statusColors[status] : "bg-secondary";;
+            <div class="col-md-4 mb-2">
+            <div class="card text-white @colorClass shadow-sm h-100">
+                <div class="card-body">
+                    <div class="card-title">
+                        <i class="fa fa-chart-line"></i> @status
+                    </div>
+                    <h4 class="card-text">@total.ToString("C")</h4>
+                </div>
+            </div>
+        </div>
+        }
+    }
+</div>
+
+
+<!-- Gráficos -->
+<div class="container mt-5">
+    <div class="col-md-12">
+        <h4 class="mb-2">📅 Sales by Month</h4>
+        <canvas id="salesByMonthChart"></canvas>
+    </div>
+</div>
+<div class="container mt-5">
+    <div class="col-md-12">
+        <h4 class="mb-2">👤 Sales by Seller</h4>
+        <canvas id="salesBySellerChart"></canvas>
+    </div>
+</div>
+
+<hr />
+
+<div class="d-lg-inline">
+    <h3 class="text-primary-emphasis">
+        Sellers table
+    </h3>
+</div>
+
+
+<div class="card m-5">
+    <div class="card-body">
+        <table id="sellerTable" class="table table-hover">
+            <thead>
+                <tr class="table-primary">
+                    <td>Seller</td>
+                    @foreach (var status in Model.SalesBySeller.StatusLabel)
+                    {
+                        <th>@status</th>
+                    }
+                    <td>Total</td>
+                </tr>
+            </thead>
+            <tbody>
+                @for (int i = 0; i < Model.SalesBySeller.SellerLabels.Count; i++)
+                    {totalValue = 0;
+                    <tr >
+                        <td>@Model.SalesBySeller.SellerLabels[i]</td>
+                        @foreach (var status in Model.SalesBySeller.StatusLabel)
+                        {
+                            var value = Model.SalesBySeller.SalesPerStatus[status][i];
+                            totalValue += value;
+                            <td>@value.ToString("C")</td> <!-- mostra formatado em R$ -->
+                        
+                        }
+                        <td>@totalValue.ToString("C")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<hr />
+<div class="container mt-5">
+    <div class="col-md-12">
+        <h4 class="mb-2"> Sales by Department</h4>
+        <canvas id="salesByDeptChart"></canvas>
+    </div>
+</div>
+
+<div class="d-lg-inline mx-5">
+    <h3 class="text-primary-emphasis">
+        Department table
+    </h3>
+</div>
+
+<div class="card m-5">
+    <div class="card-body">
+        <table id="deptTable" class="table table-hover">
+            <thead>
+                <tr class="table-primary">
+                    <td>Seller</td>
+                    @foreach (var status in Model.SalesByDepartment.StatusLabel)
+                    {
+                        <th>@status</th>
+                    }
+                    <td>Total</td>
+                </tr>
+            </thead>
+            <tbody>
+                @for (int i = 0; i < Model.SalesByDepartment.DepartmentLabels.Count; i++)
+                    {totalValue = 0;
+                    <tr >   
+                        <td>@Model.SalesByDepartment.DepartmentLabels[i]</td>
+                        @foreach (var status in Model.SalesByDepartment.StatusLabel)
+                        {
+                            var value = Model.SalesByDepartment.SalesPerStatus[status][i];
+                            totalValue += value;
+                            <td>@value.ToString("C")</td> <!-- mostra formatado em R$ -->
+                        
+                        }
+                        <td>@totalValue.ToString("C")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script src="~/js/Stats/Stats-Dashboard.js" defer>
+    </script>
+}

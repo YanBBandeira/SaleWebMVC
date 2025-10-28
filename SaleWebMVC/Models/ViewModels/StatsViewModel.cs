@@ -8,6 +8,8 @@ namespace SalesWebMVC.Models.ViewModels
         public SalesBySellerViewModel SalesBySeller { get; set; }
         public SalesByStatusViewModel SalesByStatus { get; set; }
         public SalesByDepartmentViewModel SalesByDepartment { get; set; }
+
+        public StatsFilterViewModel Filter { get; set; }
     }
 
     public class SalesByStatusViewModel
@@ -40,11 +42,11 @@ namespace SalesWebMVC.Models.ViewModels
 
     public class StatsFilterViewModel
     {
-        public DateTime? StartDate { get; set; }
-        public DateTime? EndDate { get; set; }
+        public DateTime? minDate { get; set; }
+        public DateTime? maxDate { get; set; }
 
-        public int? DepartmentId { get; set; }
-        public string? SellerId { get; set; }
+        public List<int>? DepartmentId { get; set; }
+        public List<string>? SellerId { get; set; }
 
         public SalesStatus? Status { get; set; }
     }

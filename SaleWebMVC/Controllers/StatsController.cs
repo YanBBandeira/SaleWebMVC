@@ -36,7 +36,8 @@ namespace SalesWebMVC.Controllers
         public async Task<IActionResult> Filter(StatsFilterViewModel filter)
         {
             var stats = await _statsService.GetStatsAsync(filter);
-            return PartialView("_statsPartial", stats);
+            return View("Dashboard", stats);
         }
+
     }
 }

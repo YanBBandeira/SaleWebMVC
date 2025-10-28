@@ -25,24 +25,26 @@ namespace SalesWebMVC.Services
 
             if (filter != null)
             {
-                // Aplica os filtros
-                if (filter.StartDate.HasValue)
-                {
-                    salesQuery = salesQuery.Where(s => s.Date >= filter.StartDate.Value);
-                }
-                if (filter.EndDate.HasValue)
-                {
-                    salesQuery = salesQuery.Where(s => s.Date <= filter.EndDate.Value);
-                }
-                if (filter.DepartmentId.HasValue)
-                {
-                    salesQuery = salesQuery.Where(s => s.DepartmentId == filter.DepartmentId.Value);
-                }
-                if (!string.IsNullOrEmpty(filter.SellerId))
-                {
-                    salesQuery = salesQuery.Where(s => s.SellerId == filter.SellerId);
-                }
+                // Aplica os filtros de datas
+                if (filter.minDate.HasValue)
+                    salesQuery = salesQuery.Where(s => s.Date >= filter.minDate.Value);
+
+                if (filter.maxDate.HasValue)
+                    salesQuery = salesQuery.Where(s => s.Date <= filter.maxDate.Value);
+
+                // Filtra múltiplos departamentos
+                if (filter.DepartmentId != null && filter.DepartmentId.Count > 0)
+                    salesQuery = salesQuery.Where(s => filter.DepartmentId.Contains(s.DepartmentId));
+
+                // Filtra múltiplos vendedores
+                if (filter.SellerId != null && filter.SellerId.Count > 0)
+                    salesQuery = salesQuery.Where(s => filter.SellerId.Contains(s.SellerId));
+
+                // Filtra por Status (opcional)
+                if (filter.Status.HasValue)
+                    salesQuery = salesQuery.Where(s => s.Status == filter.Status.Value);
             }
+
 
 
             // Agrupa vendas por mês e status e já ordena

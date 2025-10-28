@@ -17,17 +17,19 @@
 
 
 <!-- 🔹 Dados do gráfico -->
-<div id="all-data"
-     data-monthlabels='@Html.Raw(Json.Serialize(Model.SalesByMonth.MonthLabels))'
-     data-sellerlabels='@Html.Raw(Json.Serialize(Model.SalesBySeller.SellerLabels))'
-     data-statuslabels='@Html.Raw(Json.Serialize(Model.SalesByMonth.StatusLabel))'
-     data-deptlabels='@Html.Raw(Json.Serialize(Model.SalesByDepartment.DepartmentLabels))'
-     data-salesbymonth='@Html.Raw(Json.Serialize(Model.SalesByMonth.SalesPerStatus))'
-     data-salesbyseller='@Html.Raw(Json.Serialize(Model.SalesBySeller.SalesPerStatus))'
-     data-salesbydept='@Html.Raw(Json.Serialize(Model.SalesByDepartment.SalesPerStatus))'
-     data-statustotals='@Html.Raw(Json.Serialize(
-        Model.SalesByStatus.SalesPerStatus ))'
->
+<div>
+    <script id="chart-data" type="application/json">
+@Html.Raw(Json.Serialize(new {
+    MonthLabels = Model.SalesByMonth.MonthLabels ?? new List<string>(),
+    SellerLabels = Model.SalesBySeller.SellerLabels ?? new List<string>(),
+    StatusLabels = Model.SalesByMonth.StatusLabel ?? new List<string>(),
+    DeptLabels = Model.SalesByDepartment.DepartmentLabels ?? new List<string>(),
+    SalesByMonth = Model.SalesByMonth.SalesPerStatus ?? new Dictionary<string, List<double>>(),
+    SalesBySeller = Model.SalesBySeller.SalesPerStatus ?? new Dictionary<string, List<double>>(),
+    SalesByDept = Model.SalesByDepartment.SalesPerStatus ?? new Dictionary<string, List<double>>(),
+    StatusTotals = Model.SalesByStatus.SalesPerStatus ?? new Dictionary<string, List<double>>()
+}))
+</script>
 </div>
 
 
@@ -58,19 +60,17 @@
 <!--Filter accordion-->
 <div class="card mb-5">
     <div class="card-header">
-        <button type="button" class="accordion-button" data-bs-toggle="collapse" data-bs-target="#collapseDiv" aria-expanded="false" aria-controls="collapseDiv">
-            Filter
-        </button>
+        <h4 class="text-info-emphasis">Set filters</h4>
     </div>
-    <div id="collapseDiv" class="accordion-collapse collapse" aria-labelledby="headingOne">
-        <form id="filter-form">
+    <div id="collapseDiv" class="accordion-body" >
+        <form asp-action="Filter" method="post" id="filter-form">
             <div class="card-body">
                 <!--Linha 1-->
                 <div class="row">
                     <div class="form-group col-md-6">
                         <label class="col-md-4 control-label" for="sellerIds">Seller</label>
                         <div class="col-md-6">
-                            <select id="sellerIds" name="sellerIds" multiple class="form-control select2">
+                            <select id="sellerIds" name="sellerId" multiple class="form-control select2">
                                 @foreach (var seller in ViewBag.Sellers as List<ApplicationUser>)
                                 {
                                     <option value="@seller.Id" selected>@seller.UserFullName</option>
@@ -81,7 +81,7 @@
                     <div class="form-group col-md-6">
                         <label class="col-md-4 control-label" for="departmentIds">Department</label>
                         <div class="col-md-6">
-                            <select id="departmentIds" name="departmentIds" multiple class="form-control select2">
+                            <select id="departmentIds" name="departmentId" multiple class="form-control select2">
                                 @foreach (var dept in ViewBag.Departments as List<Department>)
                                 {
                                     <option value="@dept.Id">@dept.Name</option>
@@ -122,108 +122,6 @@
 </div>
 
 
-<!-- Gráficos -->
-<div class="container mt-5">
-    <div class="col-md-12">
-        <h4 class="mb-2">📅 Sales by Month</h4>
-        <canvas id="salesByMonthChart"></canvas>
-    </div>
-</div>
-<div class="container mt-5">
-    <div class="col-md-12">
-        <h4 class="mb-2">👤 Sales by Seller</h4>
-        <canvas id="salesBySellerChart"></canvas>
-    </div>
-</div>
-
-<hr />
-
-<div class="d-lg-inline">
-    <h3 class="text-primary-emphasis">
-        Sellers table
-    </h3>
-</div>
-
-
-<div class="card m-5">
-    <div class="card-body">
-        <table id="sellerTable" class="table table-hover">
-            <thead>
-                <tr class="table-primary">
-                    <td>Seller</td>
-                    @foreach (var status in Model.SalesBySeller.StatusLabel)
-                    {
-                        <th>@status</th>
-                    }
-                    <td>Total</td>
-                </tr>
-            </thead>
-            <tbody>
-                @for (int i = 0; i < Model.SalesBySeller.SellerLabels.Count; i++)
-                    {totalValue = 0;
-                    <tr >
-                        <td>@Model.SalesBySeller.SellerLabels[i]</td>
-                        @foreach (var status in Model.SalesBySeller.StatusLabel)
-                        {
-                            var value = Model.SalesBySeller.SalesPerStatus[status][i];
-                            totalValue += value;
-                            <td>@value.ToString("C")</td> <!-- mostra formatado em R$ -->
-                        
-                        }
-                        <td>@totalValue.ToString("C")</td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    </div>
-</div>
-
-<hr />
-<div class="container mt-5">
-    <div class="col-md-12">
-        <h4 class="mb-2"> Sales by Department</h4>
-        <canvas id="salesByDeptChart"></canvas>
-    </div>
-</div>
-
-<div class="d-lg-inline mx-5">
-    <h3 class="text-primary-emphasis">
-        Department table
-    </h3>
-</div>
-
-<div class="card m-5">
-    <div class="card-body">
-        <table id="deptTable" class="table table-hover">
-            <thead>
-                <tr class="table-primary">
-                    <td>Seller</td>
-                    @foreach (var status in Model.SalesByDepartment.StatusLabel)
-                    {
-                        <th>@status</th>
-                    }
-                    <td>Total</td>
-                </tr>
-            </thead>
-            <tbody>
-                @for (int i = 0; i < Model.SalesByDepartment.DepartmentLabels.Count; i++)
-                    {totalValue = 0;
-                    <tr >   
-                        <td>@Model.SalesByDepartment.DepartmentLabels[i]</td>
-                        @foreach (var status in Model.SalesByDepartment.StatusLabel)
-                        {
-                            var value = Model.SalesByDepartment.SalesPerStatus[status][i];
-                            totalValue += value;
-                            <td>@value.ToString("C")</td> <!-- mostra formatado em R$ -->
-                        
-                        }
-                        <td>@totalValue.ToString("C")</td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    </div>
-</div>
 
 
 
