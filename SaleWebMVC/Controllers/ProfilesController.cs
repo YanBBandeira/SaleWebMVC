@@ -41,9 +41,56 @@ namespace SalesWebMVC.Controllers
                     Role = roles.FirstOrDefault().ToString() ?? "None"
                 });
             }
-
+            ViewBag.Roles = await _roleManager.Roles
+                .Select(r => r.Name)
+                .ToListAsync();
             return View(userList);
         }
+
+
+        [Authorize(Roles = "Admin,Manager")]
+        public async Task<IActionResult> Filter(string UserFullName, string email, List<string> roles)
+        {
+            var usersQuery = _userManager.Users.AsQueryable();
+
+            if (!string.IsNullOrEmpty(UserFullName))
+            {
+                usersQuery = usersQuery.Where(u => u.UserFullName.Contains(UserFullName));
+            }
+            if (!string.IsNullOrEmpty(email))
+            {
+                usersQuery = usersQuery.Where(u => u.Email.Contains(email));
+            }
+            if (roles != null && roles.Count > 0)
+            {
+                var usersWithRoles = new List<ApplicationUser>();
+                foreach (var role in roles)
+                {
+                    var usersInRole = await _userManager.GetUsersInRoleAsync(role);
+                    usersWithRoles.AddRange(usersInRole);
+                }
+                usersQuery = usersQuery.Where(u => usersWithRoles.Select(x => x.Id).Contains(u.Id));
+            }
+
+            var userList = new List<ProfilesIndexViewModel>();
+            var users = await usersQuery.ToListAsync();
+
+            foreach (var user in users)
+            {
+                var userRoles = await _userManager.GetRolesAsync(user);
+                userList.Add(new ProfilesIndexViewModel
+                {
+                    Id = user.Id,
+                    Login = user.UserName,
+                    Name = user.UserFullName,
+                    Email = user.Email,
+                    Role = userRoles.FirstOrDefault() ?? "None"
+                });
+            }
+
+            return PartialView("_profilesTable",userList);
+        }
+
 
         [HttpGet]
         [Authorize(Roles = "Admin,Manager")]
@@ -153,12 +200,12 @@ namespace SalesWebMVC.Controllers
             }
 
             var user = await _userManager.FindByIdAsync(model.Id);
-            
+
             if (user == null)
             {
                 return NotFound();
             }
-            
+
             user.UserName = model.Name;
             user.UserFullName = model.FullName;
             user.Email = model.Email;

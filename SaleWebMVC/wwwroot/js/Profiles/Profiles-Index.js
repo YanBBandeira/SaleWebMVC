@@ -1,7 +1,52 @@
 ﻿$(document).ready(function () {
     applyPlugins();
+
+    $('.select2').select2({
+        allowClear: true,
+        width: '150%'
+    });
+    $('#bDate').datepicker({
+        format: 'dd/mm/yyyy',
+        autoclose: true,
+        todayHighlight: true,
+        clearBtn: true
+    });
 });
 
+
+$(document).on('submit', '#filter-form', function (e) {
+    e.preventDefault();
+
+    const form = $(this);
+    const url = form.attr('action') || window.location.pathname + '/Filter';
+
+    const data = form.serialize();
+
+    $.ajax({
+        url: url,
+        type: 'GET',
+        data: data,
+        success: function (partialView) {
+            $('#table-container').html(partialView);
+            applyPlugins();
+        },
+        error: function () {
+            alert('Error at acess the users data!')
+        }
+    });
+
+});
+
+
+$(document).on('click', '#limparCampos', function () {
+    LimparCampos();
+});
+
+function LimparCampos() {
+    $('.select2').val(null).trigger('change');
+    $('#userName').val('');
+    $('#userEmail').val('');
+}
 
 function applyPlugins() {
     $('#usersTable').DataTable({
