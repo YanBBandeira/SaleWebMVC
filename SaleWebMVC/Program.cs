@@ -18,7 +18,11 @@ internal class Program
             ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("ApplicationDbContext")),
             builder => builder.MigrationsAssembly("SalesWebMVC")));
 
-        builder.Services.AddScoped<SeedingService>();
+        builder.Services.AddScoped<SeedingService>(); // registra o SeedingService
+        builder.Services.AddHttpClient<IBGEService>(); // registra o IBGEService
+        builder.Services.AddScoped<SuppliersService>();
+        builder.Services.AddScoped<ProductsService>();
+        builder.Services.AddScoped<LocationService>();
         builder.Services.AddScoped<SellerService>();
         builder.Services.AddScoped<DepartmentService>();
         builder.Services.AddScoped<SalesRecordService>();
@@ -49,8 +53,11 @@ internal class Program
         using (var scope = app.Services.CreateScope())
         {
             var seedingService = scope.ServiceProvider.GetRequiredService<SeedingService>();
+            var ibgeService = scope.ServiceProvider.GetRequiredService<IBGEService>();
+           
             try
             {
+                await ibgeService.ImportStatesAndCitiesAsync(); // importa estados e cidades do IBGE
                 await seedingService.SeedAsync();
             }
             catch (Exception e)
@@ -98,7 +105,8 @@ internal class Program
         app.MapControllerRoute(
             name: "default",
             pattern: "{controller=Home}/{action=Index}/{id?}"); // Rota padrão
-            //pattern: "{controller=Account}/{action=Login}/{id?}");
+        app.MapControllers(); // Adiciona o roteamento para Controllers com atributos [Route]
+                              //pattern: "{controller=Account}/{action=Login}/{id?}");
         app.Run(); // Inicia o aplicativo
     }
 }

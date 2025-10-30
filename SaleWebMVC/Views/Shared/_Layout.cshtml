@@ -50,6 +50,14 @@
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Stats" asp-action="Index">Statistics</a>
                             </li>
                             <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle text-dark" data-bs-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="true">Stock</a>
+                                <div class="dropdown-menu" data-bs-popper="static">
+                                    <a class="nav-link" asp-area="" asp-controller="Products" asp-action="Index">Products</a>
+                                    <div class="dropdown-divider"></div>
+                                    <a class="nav-link" asp-area="" asp-controller="Suppliers" asp-action="Index">Supplier</a>
+                                </div>
+                            </li>
+                            <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle text-dark" data-bs-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="true">Infos</a>
                                 <div class="dropdown-menu" data-bs-popper="static">
                                     <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>

@@ -1,0 +1,35 @@
+﻿@model IEnumerable<SalesWebMVC.Models.Supplier>
+
+
+<table id="suppliersTable" class="table table-striped table-bordered table-hover">
+    <thead>
+        <tr class="table-primary">
+            <th>#</th>
+            <th>@Html.DisplayNameFor(model => model.Name)</th>
+            <th>@Html.DisplayNameFor(model => model.CNPJ)</th>
+            <th>@Html.DisplayNameFor(model => model.Email)</th>
+            <th>@Html.DisplayNameFor(model => model.City.State.Name)</th>
+            <th>@Html.DisplayNameFor(model => model.City.Name)</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr class="table-active">
+                <td>@Html.DisplayFor(modelItem => item.Id)</td>
+                <td>@Html.DisplayFor(modelItem => item.Name)</td>
+                <td>@Html.DisplayFor(modelItem => item.CNPJ)</td>
+                <td>@Html.DisplayFor(modelItem => item.Email)</td>
+                <td>@Html.DisplayFor(modelItem => item.City.State.Name)</td>
+                <td>@Html.DisplayFor(modelItem => item.City.Name)</td>
+                <td class="text-end">
+                    <a class="btn btn-sm btn-info" asp-action="Edit" asp-route-id="@item.Id"> <i class="bi bi-pencil-square"></i></a>
+                    <a class="btn btn-sm btn-info" asp-action="Details" asp-route-id="@item.Id"> <i class="bi bi-eye"></i></a>
+                    <a class="btn btn-sm btn-danger" asp-action="Delete" asp-route-id="@item.Id"> <i class="bi bi-trash"></i></a>
+                </td>
+            </tr>
+        }
+
+    </tbody>
+</table>
