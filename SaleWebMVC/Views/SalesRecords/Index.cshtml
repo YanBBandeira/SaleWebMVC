@@ -4,12 +4,15 @@
 @{
     ViewData["Title"] = "Sales";
 }
-
-<h1>@ViewData["Title"]</h1>
-
-<div class="d-flex justify-content-end m-4">
-    <a asp-action="Create" class="btn btn-success">New sale</a>
+<div class="row">
+    <div class="col-md-8">
+        <h1 class="text-primary-emphasis">@ViewData["Title"]</h1>
+    </div>
+    <div class="col-4">
+        <a asp-action="Create" class="btn btn-lg btn-success float-end">New sale</a>
+    </div>
 </div>
+<hr />
 
 
 <div class="table-primary" id="accordion-search">
