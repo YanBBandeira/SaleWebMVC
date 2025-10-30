@@ -1,12 +1,21 @@
 ﻿@model SalesWebMVC.Models.Department
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Create department";
 }
 
-<h1 class="text-primary-emphasis">Create department</h1>
 
+<div class="row">
+    <div class="col-md-8">
+        <h1 class="text-primary-emphasis">@ViewData["Title"]</h1>
+    </div>
+    <div class="col-4">
+        <a asp-action="Index" class="btn btn-lg btn-secondary float-end">Back</a>
+    </div>
+</div>
 <hr />
+
+
 <div class="row">
     <div class="col-md-4">
         <form asp-action="Create">
@@ -16,9 +25,8 @@
                 <input asp-for="Name" class="form-control" placeholder="Enter department name"/>
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
-            <div class="form-group d-flex">
-                <input type="submit" value="Create" class="btn btn-primary mx-1" />
-                <a asp-action="Index" class="btn btn-secondary mx-1">Cancel</a>
+            <div class="form-group mt-4 d-flex">
+                <input type="submit" value="Create" class="btn btn-lg btn-primary mx-1" />
             </div>
         </form>
     </div>

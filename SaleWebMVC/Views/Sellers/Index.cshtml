@@ -4,32 +4,32 @@
     ViewData["Title"] = "Sellers";
 }
 
-<h1>Sellers</h1>
-
+<h1 class="text-primary-emphasis">Sellers</h1>
+<hr />
 <!--#region Search accordion-->
 
 <div class="table-primary" id="accordion-search">
-    <div class="card">
+    <div class="card mb-1">
         <div class="card-header">
-            <a class="accordion-button card-title" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-                Full search...
-            </a>
+            <button type="button" class="accordion-button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false">
+                Search
+            </button>
         </div>
+        <div id="collapseThree" class="accordion-collapse collapse">
+            <form id="search-form">
 
-        <form id="search-form">
-            <div id="collapseThree" class="accordion-collapse collapse in">
                 <div class="card-body">
                     <!--#region LINHA 1-->
                     <div class="row">
-                        <div class="form-group col-md-6 no-padding">
-                            <label class="col-md-4 control-label text-right no-padding" for="Name">Name</label>
-                            <div class="col-md-8">
+                        <div class="form-group col-6">
+                            <label class="control-label text-right no-padding" for="Name">Name</label>
+                            <div class="d-flex">
                                 <input class="form-control" type="text" id="Name" name="Name" placeholder="Inser name">
                             </div>
                         </div>
-                        <div class="form-group col-md-6 no-padding">
-                            <label class="col-md-6 control-label text-right no-padding" for="DepartmentIds">Department</label>
-                            <div class="col-md-8">
+                        <div class="form-group col-6">
+                            <label class="control-label text-right no-padding" for="DepartmentIds">Department</label>
+                            <div class="d-flex">
                                 <select id="DepartmentIds" name="DepartmentIds" multiple class="form-control select2">
                                     @foreach (var dept in ViewBag.Departments as List<Department>)
                                     {
@@ -39,13 +39,13 @@
                             </div>
                         </div>
                     </div>
-
-                    <div class="card-footer text-right">
-                        <button type="button" class="btn btn-flat btn-labeled" onclick="LimparCampos()" style="margin: 0px 10px;"><span class="btn-label icon fa fa-trash-o"></span>Clean</button>
-                        <button type="submit" class="btn btn-primary btn-labeled btn-flat"><span class="btn-label icon fa fa-filter"></span>Search</button>
-                    </div>
                 </div>
-        </form>
+                <div class="card-footer text-end">
+                    <button type="button" class="btn btn-secondary" onclick="LimparCampos()">Clean</button>
+                    <button type="submit" class="btn btn-primary">Search</button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 
