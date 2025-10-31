@@ -1,0 +1,30 @@
+﻿@model IEnumerable<SalesWebMVC.Models.Product>
+
+@{
+    ViewData["Title"] = "Products";
+}
+
+
+
+<div class="row">
+    <div class="col-md-8">
+        <h1 class="text-primary-emphasis">@ViewData["title"]</h1>
+    </div>
+    <div class="col-4">
+        <a asp-action="Create" class="btn btn-lg btn-success float-end">New Product</a>
+    </div>
+</div>
+<hr />
+
+
+<div id="table-container" class="card border-primary p-4">
+    <div class="row">
+        @await Html.PartialAsync("_productsTable", Model)
+    </div>
+</div>
+
+
+@section Scripts {
+    <script src="~/js/Products/Products.js" defer>
+    </script>
+}

@@ -13,6 +13,12 @@ namespace SalesWebMVC.Data
         public DbSet<Department> Departments { get; set; }
         public DbSet<SalesRecord> SalesRecords { get; set; }
 
+        public DbSet<State> State { get; set; }
+        public DbSet<City> City { get; set; }
+        public DbSet<Supplier> Suppliers { get; set; }
+        public DbSet<Product> Products { get; set; }
+        
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
