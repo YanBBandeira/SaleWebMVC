@@ -1,10 +1,12 @@
 ﻿$(document).ready(function () {
-    applyPlugins();
- 
-})
+    
+    loadStockSummary();
+    console.log("Inventory.js CARREGADO!")
+});
 
-function applyPlugins() {
-    $('#productsTable').DataTable({
+//#region DataTable Plugins
+function tablePlugins() {
+    $('.table').DataTable({
         dom: '<"d-flex justify-content-between mb-6"lfB>rtip',
         buttons: [
             {
@@ -24,7 +26,7 @@ function applyPlugins() {
             }
         ],
         columnDefs: [
-            { orderable: false, targets: 6 }
+            { orderable: false, targets: 5 }
         ],
         language: {
             search: "",
@@ -45,18 +47,30 @@ function applyPlugins() {
         initComplete: function () {
             $('.dataTables_filter input')
                 .addClass('form-control form-control-sm d-inline-block ms-2')
-                .attr('placeholder', '🔍 Search...');
-
+            // ...
             $('.dataTables_length select')
                 .addClass('form-select form-select-sm d-inline-block ms-2');
-        },
-        drawCallback: function () {
-            $('.dataTables_paginate .paginate_button')
-                .addClass('btn btn-sm btn-outline-info mx-1');
-
-            $('.dataTables_paginate .paginate_button.current')
-                .removeClass('btn-outline-info')
-                .addClass('btn-primary text-white');
         }
     });
-};
+}
+//#endregion
+
+//#region Load Stock Summary
+function loadStockSummary() {
+    //Requisição AJAX para obter o resumo do estoque
+    $.ajax({
+        url: '/Inventory/GetStockSummaryTable',
+        type: 'GET',
+        dataType: 'html',
+        success: function (data) {
+            console.log("Deu certo o AJAX")
+            $('#stockSummaryContainer').html(data); 
+            tablePlugins();
+        },
+        error: function (xhr, status, error) {
+            $('#stockSummaryContainer').html('<div class="alert alert-danger"> Erro at:' + error + '</div >'); 
+        }
+    });
+    console.log("AJAX disparado."); // NOVO log de controle
+}
+//#endregion

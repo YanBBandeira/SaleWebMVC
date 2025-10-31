@@ -74,3 +74,17 @@ body {
     align-items: center;
     z-index: 999;
 }
+
+/* Estiliza o rótulo com um asterisco */
+.obrigatorio::after {
+    content: "*";
+    color: red; /* Amarelo Bootstrap 'warning' */
+    margin-left: 4px;
+}
+
+
+/* Classe para aplicar o destaque amarelo diretamente no elemento. */
+.input-required-highlight {
+    /* Cor de fundo amarela clara (Lemon Chiffon) */
+    background-color: #fffacd !important;
+}

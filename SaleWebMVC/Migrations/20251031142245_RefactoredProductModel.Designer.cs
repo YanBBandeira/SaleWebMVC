@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SalesWebMVC.Data;
 
@@ -11,9 +12,11 @@ using SalesWebMVC.Data;
 namespace SalesWebMVC.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251031142245_RefactoredProductModel")]
+    partial class RefactoredProductModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -280,44 +283,6 @@ namespace SalesWebMVC.Migrations
                     b.ToTable("Departments");
                 });
 
-            modelBuilder.Entity("SalesWebMVC.Models.InventoryMovement", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("Date")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<int>("MovementType")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Observation")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("varchar(500)");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Quantity")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("varchar(255)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProductId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("inventoryMovements");
-                });
-
             modelBuilder.Entity("SalesWebMVC.Models.Product", b =>
                 {
                     b.Property<int>("Id")
@@ -517,25 +482,6 @@ namespace SalesWebMVC.Migrations
                     b.Navigation("State");
                 });
 
-            modelBuilder.Entity("SalesWebMVC.Models.InventoryMovement", b =>
-                {
-                    b.HasOne("SalesWebMVC.Models.Product", "Product")
-                        .WithMany("InventoryMovements")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("SalesWebMVC.Models.ApplicationUser", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Product");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("SalesWebMVC.Models.Product", b =>
                 {
                     b.HasOne("SalesWebMVC.Models.Department", "Department")
@@ -596,11 +542,6 @@ namespace SalesWebMVC.Migrations
             modelBuilder.Entity("SalesWebMVC.Models.Department", b =>
                 {
                     b.Navigation("Sellers");
-                });
-
-            modelBuilder.Entity("SalesWebMVC.Models.Product", b =>
-                {
-                    b.Navigation("InventoryMovements");
                 });
 
             modelBuilder.Entity("SalesWebMVC.Models.State", b =>

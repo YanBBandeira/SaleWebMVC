@@ -27,6 +27,7 @@ internal class Program
         builder.Services.AddScoped<DepartmentService>();
         builder.Services.AddScoped<SalesRecordService>();
         builder.Services.AddScoped<StatsService>();
+        builder.Services.AddScoped<InventoryService>();
         // Add services to the container.
         builder.Services.AddControllersWithViews();
         builder.Services.AddDefaultIdentity<ApplicationUser>(

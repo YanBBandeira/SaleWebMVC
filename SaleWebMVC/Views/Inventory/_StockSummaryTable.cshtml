@@ -1,0 +1,51 @@
+﻿@model IEnumerable<SalesWebMVC.Models.InventoryMovement>
+@using SalesWebMVC.Models.Enums
+
+<table id="movementsTable" class="table table-striped table-hover">
+    <thead>
+        <tr class="table-primary">
+            <th>#</th>
+            <th>@Html.DisplayNameFor(Model => Model.Product.Name)</th>
+            <th>@Html.DisplayNameFor(Model => Model.MovementType)</th>
+            <th>@Html.DisplayNameFor(Model => Model.Quantity)</th>
+            <th>@Html.DisplayNameFor(Model => Model.User.UserName)</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            string rowClass = (item.MovementType == MovementType.Entry || item.MovementType ==
+            MovementType.Devolution) ? "table-success" : "table-secondary";
+            <tr class="table-active @rowClass">
+                <td>@Html.DisplayFor(modelItem => item.Id)</td>
+                <td>@Html.DisplayFor(modelItem => item.Product.Name)</td>
+                <td>@Html.DisplayFor(modelItem => item.MovementType)</td>
+                @if (item.MovementType == MovementType.Exit)
+                {
+                    <td class="text-danger">
+                        @Html.DisplayFor(modelItem =>
+                        item.Quantity)
+            </td>
+                        }
+                else
+                {
+                    <td class="text-success">
+                        @Html.DisplayFor(modelItem =>
+                        item.Quantity)
+            </td>
+                        }
+                <td>@Html.DisplayFor(modelItem => item.User.UserName)</td>
+                <td>
+                    <a class="btn btn-sm btn-info" asp-action="Edit" asp-route-id="@item.Id">
+                        <i class="fa fa-edit"></i>
+                    </a>
+                    <form asp-action="Delete" asp-route-id="@item.Id" method="post" class="d-inline" onsubmit="return confirm('Are you sure?');">
+                        <button type="submit" class="btn btn-sm btn-danger">
+                            <i class="fa fa-trash"></i>
+                        </button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>

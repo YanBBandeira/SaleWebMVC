@@ -13,9 +13,18 @@ namespace SalesWebMVC.Services
             _context = context;
         }
 
+        public async Task<List<Product>> FindAllAsync()
+        {
+            return await _context.Products.Include(p => p.Department)
+                .Include(p => p.Supplier)
+                .ThenInclude(p => p.City)
+                .ThenInclude(p => p.State)
+                .ToListAsync();
+        }
         public async Task<List<Product>> FindAllWithSupplirLocationAsync()
         {
-            return await _context.Products.Include(p => p.Supplier)
+            return await _context.Products.Include(p => p.Department)
+                                           .Include(p => p.Supplier)
                                           .ThenInclude(s => s.City)
                                           .ThenInclude(c => c.State)
                                           .ToListAsync();
@@ -23,7 +32,7 @@ namespace SalesWebMVC.Services
 
         public async Task<Product> FindByIdAsync(int id)
         {
-            return await _context.Products.Include(p => p.Supplier)
+            return await _context.Products.Include(p => p.Department).Include(p => p.Supplier)
                                           .ThenInclude(s => s.City)
                                           .ThenInclude(c => c.State)
                                           .FirstOrDefaultAsync(p => p.Id == id);
@@ -31,7 +40,7 @@ namespace SalesWebMVC.Services
 
         public async Task<List<Product>> FindBySupplierIdAsync(int supplierId)
         {
-            return await _context.Products.Include(p => p.Supplier)
+            return await _context.Products.Include(p => p.Department).Include(p => p.Supplier)
                                           .ThenInclude(s => s.City)
                                           .ThenInclude(c => c.State)
                                           .Where(p => p.SupplierId == supplierId)
@@ -40,7 +49,7 @@ namespace SalesWebMVC.Services
 
         public async Task<List<Product>> FindByDepartmentIdAsync(int departmentId)
         {
-            return await _context.Products.Include(p => p.Supplier)
+            return await _context.Products.Include(p => p.Department).Include(p => p.Supplier)
                                           .ThenInclude(s => s.City)
                                           .ThenInclude(c => c.State)
                                           .Where(p => p.DepartmentId == departmentId)
