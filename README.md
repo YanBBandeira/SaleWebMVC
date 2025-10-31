@@ -95,3 +95,10 @@ Filtros para selecionar período, vendedor e departamento
 Tudo isso renderizado com Chart.js, que é simples, leve e totalmente personalizável.
 
 Além disso, é possível integrar AJAX para atualizar os gráficos sem precisar recarregar a página — um passo importante para quem quer aprender interatividade no front-end com ASP.NET.
+
+
+#### Estrutura final do projeto UML
+
+ <img width="2981" height="2783" alt="Mermaid Chart - Create complex, visual diagrams with text -2025-10-31-133043" src="https://github.com/user-attachments/assets/cf672a8a-265b-4717-92ad-24171b4014c5" />
+
+
