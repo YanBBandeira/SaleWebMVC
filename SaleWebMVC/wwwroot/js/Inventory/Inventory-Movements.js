@@ -1,7 +1,7 @@
 ﻿$(document).ready(function () {
-    
-    loadStockSummary();
-    console.log("Inventory.js CARREGADO!")
+    console.log("Inventory-Movements.js CARREGADO!")
+    loadMovementHistory();
+    tablePlugins();
 });
 
 //#region DataTable Plugins
@@ -26,7 +26,7 @@ function tablePlugins() {
             }
         ],
         columnDefs: [
-            { orderable: false, targets: 5 }
+            { orderable: true}
         ],
         language: {
             search: "",
@@ -55,22 +55,24 @@ function tablePlugins() {
 }
 //#endregion
 
-//#region Load Stock Summary
-function loadStockSummary() {
-    //Requisição AJAX para obter o resumo do estoque
+
+
+//#region load Movement History
+
+function loadMovementHistory() {
     $.ajax({
-        url: '/Inventory/GetStockSummaryTable',
+        url: '/Inventory/GetMovementHistoryTable',
         type: 'GET',
         dataType: 'html',
         success: function (data) {
-            console.log("Deu certo o AJAX")
-            $('#stockSummaryContainer').html(data); 
+            console.log("Deu certo o AJAX History")
+            $('#movementHistoryTableContainer').html(data); 
             tablePlugins();
         },
         error: function (xhr, status, error) {
-            $('#stockSummaryContainer').html('<div class="alert alert-danger"> Erro at:' + error + '</div >'); 
+            $('#movementHistoryTableContainer').html('<div class="alert alert-danger"> Erro at:' + error + '</div >'); 
         }
     });
-    console.log("AJAX disparado."); // NOVO log de controle
+    console.log("History AJAX disparado."); // NOVO log de controle
 }
 //#endregion

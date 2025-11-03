@@ -7,6 +7,7 @@ namespace SalesWebMVC.Models
         public int Id { get; set; }
 
         [Required]
+        [Display(Name = "Supplier")]
         public string Name { get; set; }
 
         [Display(Name = "CNPJ/CPF")]

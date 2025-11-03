@@ -23,6 +23,7 @@ namespace SalesWebMVC.Models
         public DateTime Date { get; set; } = DateTime.Now;
 
         public string? UserId { get; set; } // Foreign key to User
+
         public ApplicationUser? User { get; set; }
 
         [MaxLength(500)]

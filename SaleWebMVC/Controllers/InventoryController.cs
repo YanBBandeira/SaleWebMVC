@@ -85,7 +85,7 @@ namespace SalesWebMVC.Controllers
         public async Task<IActionResult> GetMovementHistoryTable()
         {
             var history = await _inventoryService.GetMovementHistoryAsync();
-            return PartialView("_MovementsHistoryTable", history);
+            return PartialView("_MovementHistoryTable", history);
         }
 
         public async Task<IActionResult> RestockAlert()
