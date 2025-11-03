@@ -45,16 +45,19 @@ namespace SalesWebMVC.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(ProductFormViewModel viewModel)
         {
-            if (ModelState.IsValid)
-            {
-                await _productsService.AddProductAsync(viewModel.Product);
-                return RedirectToAction(nameof(Index));
-            }
-
-            //se falhar, recarrega a lista de fornecedores e departamentos para o form
-            viewModel.Suppliers = await _supplierService.FindAllAsync();
-            viewModel.Departments = await _departmentService.FindAllAsync();
-            return View(viewModel);
+            await _productsService.AddProductAsync(viewModel.Product);
+            return RedirectToAction(nameof(Index));
         }
+        //    if (ModelState.IsValid)
+        //    {
+        //        await _productsService.AddProductAsync(viewModel.Product);
+        //        return RedirectToAction(nameof(Index));
+        //    }
+
+        //    //se falhar, recarrega a lista de fornecedores e departamentos para o form
+        //    viewModel.Suppliers = await _supplierService.FindAllAsync();
+        //    viewModel.Departments = await _departmentService.FindAllAsync();
+        //    return View(viewModel);
+        //}
     }
 }

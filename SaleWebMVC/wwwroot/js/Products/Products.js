@@ -24,7 +24,7 @@ function applyPlugins() {
             }
         ],
         columnDefs: [
-            { orderable: false, targets: 5 }
+            { orderable: false, targets: 6 }
         ],
         language: {
             search: "",

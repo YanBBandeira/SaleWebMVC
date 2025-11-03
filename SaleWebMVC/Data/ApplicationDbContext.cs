@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using SalesWebMVC.Models;
+using System.Reflection.Emit;
 
 namespace SalesWebMVC.Data
 {
@@ -17,7 +18,8 @@ namespace SalesWebMVC.Data
         public DbSet<City> City { get; set; }
         public DbSet<Supplier> Suppliers { get; set; }
         public DbSet<Product> Products { get; set; }
-        
+
+        public DbSet<InventoryMovement> InventoryMovements { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -29,6 +31,22 @@ namespace SalesWebMVC.Data
                 .HasForeignKey(u => u.DepartmentId)
                 .OnDelete(DeleteBehavior.Cascade)
                 .IsRequired(false);
+
+            // Data/SaleWebMVCContext.cs (Dentro do OnModelCreating)
+
+            // 1. Configuração do Relacionamento com DEPARTMENT (CORREÇÃO)
+            builder.Entity<Product>()
+                .HasOne(p => p.Department)
+                .WithMany() // <--- SEM ARGUMENTO: Relacionamento unidirecional
+                .HasForeignKey(p => p.DepartmentId)
+                .IsRequired();
+
+            // 2. Configuração do Relacionamento com SUPPLIER (CORREÇÃO)
+            builder.Entity<Product>()
+                .HasOne(p => p.Supplier)
+                .WithMany(s => s.Products) // <--- SEM ARGUMENTO: Relacionamento unidirecional
+                .HasForeignKey(p => p.SupplierId)
+                .IsRequired();
         }
 
     }

@@ -1,0 +1,36 @@
+﻿@model IEnumerable<SalesWebMVC.Models.InventoryMovement>
+
+
+@{
+    ViewData["Title"] = "Current Inventory";
+}
+
+<div class="row">
+    <div class="col-md-8">
+        <h1 class="text-primary-emphasis">@ViewData["title"]</h1>
+    </div>
+    <div class="col-2">
+        <a asp-action="Create" class="btn btn-lg btn-success float-end"><i class="fas fa-plus m-2"></i>New movement</a>
+    </div>
+    <div class="col-2">
+        <a asp-action="Movements" class="btn btn-lg btn-info"><i class="fas fa-history"></i>Historic</a>
+    </div>
+</div>
+<hr />
+
+<div id="stockSummaryContainer">
+    <div class="text-center">
+        <i class="fas fa-spinner fa-spin"></i>
+        Loaging stock summary...
+    </div>
+</div>
+
+
+
+@section Scripts {
+    <script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.25/js/dataTables.bootstrap5.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.25/css/dataTables.bootstrap5.min.css" />
+    <script src="~/js/Inventory/Inventory-Index.js" defer>
+    </script>
+}

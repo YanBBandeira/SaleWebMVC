@@ -5,12 +5,17 @@
     var roles = ViewBag.Roles as List<string>;
 }
 
-
-<div class="card border-primary mb-3" data-role="@ViewBag.UserRole">
-    <div class="card-header">
+<div class="row">
+    <div class="col-md-8">
         <h2 class="text-primary-emphasis">@ViewData["Title"]</h2>
     </div>
-    <hr />
+    <div class="col-4">
+        <a asp-action="Index" class="btn btn-lg btn-secondary float-end"><i class="fas fa-arrow-left me-2"></i>Back</a>
+    </div>
+</div>
+<hr />
+
+<div class="card border-primary mb-3" data-role="@ViewBag.UserRole">
     <form asp-action="Create" method="post">
         <div class="card-body">
 
@@ -83,7 +88,6 @@
         <div class="card-footer">
             <div class="d-flex mx-2">
                 <button type="submit" class="btn btn-primary mx-1">Create</button>
-                <a asp-action="Index" class="btn btn-secondary mx-1">Back to List</a>
             </div>
         </div>
 

@@ -9,6 +9,7 @@
             <th>@Html.DisplayNameFor(model => model.Price)</th>
             <th>@Html.DisplayNameFor(model => model.Supplier)</th>
             <th>@Html.DisplayNameFor(model => model.Department)</th>
+            <th>@Html.DisplayNameFor(model => model.StockQuantity)</th>
             <th></th>
         </tr>
     </thead>
@@ -21,7 +22,7 @@
                 <td>@Html.DisplayFor(modelItem => item.Price)</td>
                 <td>@Html.DisplayFor(modelItem => item.Supplier.Name)</td>
                 <td>@Html.DisplayFor(modelItem => item.Department.Name)</td>
-                <td class="text-end">
+                <td>@Html.DisplayFor(modelItem => item.StockQuantity)</td>
                 <td class="text-end">
                     <a class="btn btn-sm btn-info" asp-action="Edit" asp-route-id="@item.Id"> <i class="bi bi-pencil-square"></i></a>
                     <a class="btn btn-sm btn-info" asp-action="Details" asp-route-id="@item.Id"> <i class="bi bi-eye"></i></a>

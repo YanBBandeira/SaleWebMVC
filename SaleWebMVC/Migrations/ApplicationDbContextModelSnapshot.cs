@@ -280,6 +280,44 @@ namespace SalesWebMVC.Migrations
                     b.ToTable("Departments");
                 });
 
+            modelBuilder.Entity("SalesWebMVC.Models.InventoryMovement", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int>("MovementType")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Observation")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("inventoryMovements");
+                });
+
             modelBuilder.Entity("SalesWebMVC.Models.Product", b =>
                 {
                     b.Property<int>("Id")
@@ -288,10 +326,10 @@ namespace SalesWebMVC.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("CityId")
+                    b.Property<int>("DepartmentId")
                         .HasColumnType("int");
 
-                    b.Property<int>("DepartmentId")
+                    b.Property<int>("MinimumStock")
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
@@ -308,8 +346,6 @@ namespace SalesWebMVC.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CityId");
 
                     b.HasIndex("DepartmentId");
 
@@ -481,14 +517,27 @@ namespace SalesWebMVC.Migrations
                     b.Navigation("State");
                 });
 
-            modelBuilder.Entity("SalesWebMVC.Models.Product", b =>
+            modelBuilder.Entity("SalesWebMVC.Models.InventoryMovement", b =>
                 {
-                    b.HasOne("SalesWebMVC.Models.City", "City")
-                        .WithMany()
-                        .HasForeignKey("CityId")
+                    b.HasOne("SalesWebMVC.Models.Product", "Product")
+                        .WithMany("InventoryMovements")
+                        .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("SalesWebMVC.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Product");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("SalesWebMVC.Models.Product", b =>
+                {
                     b.HasOne("SalesWebMVC.Models.Department", "Department")
                         .WithMany()
                         .HasForeignKey("DepartmentId")
@@ -500,8 +549,6 @@ namespace SalesWebMVC.Migrations
                         .HasForeignKey("SupplierId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("City");
 
                     b.Navigation("Department");
 
@@ -549,6 +596,11 @@ namespace SalesWebMVC.Migrations
             modelBuilder.Entity("SalesWebMVC.Models.Department", b =>
                 {
                     b.Navigation("Sellers");
+                });
+
+            modelBuilder.Entity("SalesWebMVC.Models.Product", b =>
+                {
+                    b.Navigation("InventoryMovements");
                 });
 
             modelBuilder.Entity("SalesWebMVC.Models.State", b =>
