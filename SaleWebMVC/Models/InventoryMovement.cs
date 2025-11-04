@@ -26,7 +26,7 @@ namespace SalesWebMVC.Models
 
         public ApplicationUser? User { get; set; }
 
-        [MaxLength(500)]
+        [MaxLength(5000)]
         public string? Observation { get; set; }
     }
 }

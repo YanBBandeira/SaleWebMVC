@@ -1,0 +1,77 @@
+﻿@using SalesWebMVC.Models.Enums
+@model IEnumerable<SalesWebMVC.Models.SalesRecord>
+
+<div class="card border-primary p-4">
+    <div class="card-heading text-white bg-success p-2 rounded">
+        <h3 class="card-title">
+            Total sales = $ <strong>@Model.Sum(obj => obj.Amount).ToString("F2")</strong>
+            Billed sales = $ <strong>@Model.Where(obj => obj.Status == SalesWebMVC.Models.Enums.SalesStatus.Billed).Sum(obj => obj.Amount).ToString("F2")</strong>
+        </h3>
+    </div>
+    <div class="card-body">
+        <table class="table table-striped table-hover salesTable">
+            <thead>
+                <tr class="table-info">
+                    <th>#</th>
+                    <th>@Html.DisplayNameFor(model => model.First().Date)</th>
+                    <th>@Html.DisplayNameFor(model => model.First().Seller.UserFullName)</th>
+                    <th>@Html.DisplayNameFor(model => model.First().Seller.Department.Name)</th>
+                    <th>@Html.DisplayNameFor(model => model.First().Amount)</th>
+                    <th>@Html.DisplayNameFor(model => model.First().Status)</th>
+                    <th>Actions</th> @* Título da coluna de ações *@
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    // Determina a classe CSS com base no status da venda
+                    var rowClass = "";
+                    if (item.Status == SalesStatus.Billed)
+                    {
+                        rowClass = "text-success";
+                    }
+                    else if (item.Status == SalesStatus.Canceled)
+                    {
+                        rowClass = "text-decoration-line-through text-danger";
+                    }
+
+                    <tr id="sale-row-@item.Id" class="table-bordered @rowClass">
+                        <td>@item.Id</td>
+                        <td>@item.Date.ToString("dd/MM/yyyy")</td>
+                        <td>@item.Seller.UserFullName</td>
+                        <td>@item.Seller.Department.Name</td>
+                        <td>$ @item.Amount.ToString("F2")</td>
+                        <td>@item.Status</td>
+                        <td class="text-center">
+
+                            @* Botões de Edição e Detalhes (Padrão) *@
+                            <a class="btn btn-primary btn-sm me-1" asp-action="Edit" asp-route-id="@item.Id"><i class="fa fa-info-circle"></i></a>
+                            <a asp-action="Details" asp-controller="SalesRecords" asp-route-id="@item.Id" class="btn btn-info btn-sm me-1" data-id="@item.Id"><i class="fa fa-eye"></i></a>
+                            @* Botão FATURAR (Aparece se PENDENTE) *@
+                            @if (item.Status == SalesStatus.Pending)
+                            {
+                                <button type="button"
+                                        class="btn btn-success btn-sm me-1 action-bill"
+                                        data-id="@item.Id"
+                                        title="Faturar Venda (Baixa de Estoque)">
+                                    Bill
+                                </button>
+                            }
+
+                            @* Botão CANCELAR (Aparece se FATURADO) *@
+                            @if (item.Status == SalesStatus.Billed)
+                            {
+                                <button type="button"
+                                        class="btn btn-danger btn-sm action-cancel"
+                                        data-id="@item.Id"
+                                        title="Cancelar Venda (Estorno de Estoque)">
+                                    Cancel
+                                </button>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

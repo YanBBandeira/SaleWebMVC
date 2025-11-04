@@ -26,7 +26,7 @@ namespace SalesWebMVC.Services
             {
                 if (product.StockQuantity < movement.Quantity)
                 {
-                    throw new Exception("Insufficient stock for removal");
+                    throw new InvalidOperationException("Insufficient stock for removal");
                 }
             }
 
@@ -98,6 +98,8 @@ namespace SalesWebMVC.Services
                 .OrderBy(p => p.Name);
             return await query.ToListAsync();
         }
+
+
     }
 }
 

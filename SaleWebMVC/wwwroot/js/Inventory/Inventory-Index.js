@@ -74,6 +74,3 @@ function loadStockSummary() {
     console.log("AJAX disparado."); // NOVO log de controle
 }
 //#endregion
-
-
-s

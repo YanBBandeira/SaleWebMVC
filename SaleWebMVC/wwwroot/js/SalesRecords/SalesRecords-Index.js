@@ -1,78 +1,158 @@
 ﻿$(document).ready(function () {
-    applyPlugins();
-});
+    // Inicialização do Select2 e Datepickers (assumindo que você usa)
+    console.log("SalesRecords-Index CARREGADO!")
+    $('.select2').select2();
+    $('#minDate, #maxDate').datepicker({
+        format: 'yyyy-mm-dd',
+        autoclose: true
+    });
+    tablePlugins()
 
+    // 1. Lógica de Filtro (Busca de Vendas)
+    $('#search-form').on('submit', function (e) {
+        e.preventDefault();
+        var form = $(this);
+        var url = form.attr('action') || window.filterUrl;
+        var data = form.serialize();
 
-$(document).on('click', '#limparCampos', function () {
-    LimparCampos();
-});
+        $('#loading-spinner').removeClass('d-none');
 
-$(document).on('submit', '#search-form', function (e) {
-    e.preventDefault(); // Evita o envio padrão do formulário
-
-    const form = $(this);
-    const url = form.attr('action') || window.location.pathname + '/Filter'; // Usa a URL do formulário ou a URL atual
-
-    const data = form.serialize(); // Serializa os dados do formulário
-
-    $.ajax({
-        url: url,
-        type: 'GET',
-        data: data,
-        success: function (partialViewHtml) {
-            $('#salesResults').html(partialViewHtml); // Atualiza a seção de resultados com a Partial View retornada
-            applyPlugins();
-
-            setTimeout(function () {
-                const $table = $('#salesTable');
-
-                if ($table.length) {
-                    $('html, body').animate({
-                        scrollTop: $table.offset().top - 100 // rola até um pouco acima 
-                    }, 400, function () {
-                        $table.focus(); // foco visual
-                    });
+        $.ajax({
+            type: 'GET',
+            url: url,
+            data: data,
+            success: function (partialViewHtml) {
+                $('#salesResults').html(partialViewHtml);
+                $('#loading-spinner').addClass('d-none');
+                tablePlugins()
+                // Abre o acordeão se o filtro foi aplicado (se tiver ViewBag.ShouldOpenAccordion)
+                var accordion = $('#collapseOne');
+                if (accordion.data('open') === 'true') {
+                    accordion.collapse('show');
                 }
-            }, 100);
+            },
+            error: function () {
+                alert('Erro ao realizar a busca de vendas.');
+                $('#loading-spinner').addClass('d-none');
+            }
+        });
+    });
 
-        },
-        error: function () {
-            alert('Erro ao buscar os registros de vendas.');
-        }
+
+    let currentSaleId = null;
+    let currentActionUrl = null;
+    let currentActionName = null;
+    let currentToken = null;
+
+    // 2. Lógica de Ação AJAX (Bill/Cancel)
+    $('#salesResults').on('click', '.action-bill, .action-cancel', function () {
+        console.log("Botão Bill/Cancel clicado");
+        var button = $(this);
+
+        currentSaleId = button.data('id');
+        var isBill = button.hasClass('action-bill');
+        currentActionName = isBill ? 'Bill' : 'Cancel';
+        currentActionUrl = isBill ? '/SalesRecords/Bill' : '/SalesRecords/Cancel';
+        currentToken = $('input[name="__RequestVerificationToken"]').val();
+
+
+        // Preenche o modal de confirmação
+        $('#confirmationModal .modal-body #confirmationMessage').text(`Are you sure you want to ${currentActionName} the sell Nº ${currentSaleId}?`);
+
+        // Muda a cor do botão 'Yes' dependente da ação
+        $('#btnConfirmAction').removeClass('btn-success btn-danger')
+            .addClass(isBill ? 'btn-success' : 'btn-danger')
+            .text(`Yes, ${currentActionName}`);
+
+        // Mostra o modal
+        var confirmationModal = new bootstrap.Modal(document.getElementById('confirmationModal'));
+        confirmationModal.show();
+    });
+
+    // Adicionar o evento de clique ao botão de confirmação no modal
+    $('#btnConfirmAction').off('click').on('click', function () {
+        //Esconde o modal de confirmação
+        bootstrap.Modal.getInstance(document.getElementById('confirmationModal')).hide();
+        console.log("Confirmação recebida para ação:", currentActionName, "na venda ID:", currentSaleId);
+        // Só prossegue se todas as variáveis estiverem definidas
+        if (currentSaleId && currentActionUrl && currentActionName) {
+            executeActionAjax(currentSaleId, currentActionUrl, currentActionName, currentToken);
+        };
+
+    });
+
+
+
+
+    function executeActionAjax(saleId, actionUrl, actionName, token) {
+        $('#loading-spinner').removeClass('d-none');
+
+        $.ajax({
+            type: 'POST',
+            url: actionUrl,
+            data: {
+                id: saleId,
+                __RequestVerificationToken: token
+            },
+            success: function (response) {
+                console.log('Sucesso no AJAX')
+                if (response.success) {
+                       showNotificationModal('Sucesso', response.message, 'success'); 
+
+                    // RECARREGA OS RESULTADOS DO FILTRO ATUAL (Para atualizar a tabela)
+                    $('#search-form').trigger('submit');
+                    tablePlugins()
+
+                } else {
+                    showNotificationModal('Falha na Ação', `Falha ao ${actionName}: ${response.message}`,
+                        'error'); 
+                }
+            },
+            error: function (xhr) {
+                var errorMessage = xhr.responseJSON ? xhr.responseJSON.message : `Erro desconhecido ao ${actionName}.`; 
+            },
+            complete: function () {
+                $('#loading-spinner').addClass('d-none');
+            }
+        });
+    }
+
+    // 3. Lógica de Limpar Campos (já existente, mantida)
+    $('#limparCampos').click(function () {
+        $('#search-form')[0].reset();
+        $('.select2').val(null).trigger('change');
     });
 });
 
-// Evento de click para abrir modal de detalhes
-$(document).on('click', '.view-details', function (e) {
-    e.preventDefault();
 
-    const saleId = $(this).data('id');
+function showNotificationModal(title, message, type) {
+    const modalTitle = $('#notificationModalLabel');
+    const modalBody = $('#notificationMessage');
+    const modalHeader = $('#notificationModal .modal-header');
 
-    $.ajax({
-        url: detailsUrl,//'@Url.Action("Details", "SalesRecords")', // Ajuste o controller se necessário
-        data: { id: saleId },
-        type: 'GET',
-        success: function (result) {
-            $('#detailsModalBody').html(result);
-            $('#detailsModal').modal('show');
-        },
-        error: function () {
-            alert('Erro ao carregar os detalhes.');
-        }
-    });
-});
+    // 1. Limpa classes e define o conteúdo 
+    modalTitle.html(title);
+    modalBody.text(message);
+    modalHeader.removeClass('bg-success bg-danger bg-warning');
 
-function LimparCampos() {
-    $('#Seller').val('');
-    $('#minDate').val('');
-    $('#maxDate').val('');
-    $('#DepartmentIds').val(null).trigger('change');
-    $('#salesStatusIds').val(null).trigger('change');
+    // 2. Aplica cores e ícones baseados no tipo 
+    if (type === 'success') {
+        modalTitle.prepend('<i class="fas fa-check-circle me-2"></i>');
+        modalHeader.addClass('bg-success text-white');
+    } else if (type === 'error') {
+        modalTitle.prepend('<i class="fas fa-times-circle me-2"></i>');
+        modalHeader.addClass('bg-danger text-white');
+    } else {
+        modalTitle.prepend('<i class="fas fa-exclamation-triangle me-2"></i>');
+        modalHeader.addClass('bg-warning text-dark');
+    }
+
+    // 3. Mostra o modal 
+    var notificationModal = new bootstrap.Modal(document.getElementById('notificationModal'));
+    notificationModal.show();
 }
-
-
-function applyPlugins() {
-    $('#salesTable').DataTable({
+function tablePlugins() {
+    $('.table').DataTable({
         dom: '<"d-flex justify-content-between mb-6"lfB>rtip',
         buttons: [
             {
@@ -92,7 +172,7 @@ function applyPlugins() {
             }
         ],
         columnDefs: [
-            { orderable: false, targets: 6 }
+            { orderable: false, targets: 5 }
         ],
         language: {
             search: "",
@@ -113,29 +193,9 @@ function applyPlugins() {
         initComplete: function () {
             $('.dataTables_filter input')
                 .addClass('form-control form-control-sm d-inline-block ms-2')
-                .attr('placeholder', '🔍 Search...');
-
+            // ...
             $('.dataTables_length select')
                 .addClass('form-select form-select-sm d-inline-block ms-2');
-        },
-        drawCallback: function () {
-            $('.dataTables_paginate .paginate_button')
-                .addClass('btn btn-sm btn-outline-info mx-1');
-
-            $('.dataTables_paginate .paginate_button.current')
-                .removeClass('btn-outline-info')
-                .addClass('btn-primary text-white');
         }
     });
-    $('.select2').select2({
-        allowClear: true,
-        width: '150%'
-    });
-    $("#minDate").datepicker();
-    $("#maxDate").datepicker();
-};
-
-
-
-
-
+}

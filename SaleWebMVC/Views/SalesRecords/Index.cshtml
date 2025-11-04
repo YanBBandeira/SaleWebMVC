@@ -16,7 +16,6 @@
 
 
 <div class="table-primary" id="accordion-search">
-    <!-- SPINNER -->
     <div id="loading-spinner" class="spinner-overlay d-none">
         <div class="spinner-border text-primary" role="status">
             <span class="spinner-border spinner-border-sm">Loading...</span>
@@ -31,7 +30,6 @@
         <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#accordionExample" data-open="@((ViewBag.ShouldOpenAccordion ?? false).ToString().ToLower())" style="">
             <form id="search-form">
                 <div class="card-body">
-                    <!--#region LINHA 1-->
                     <div class="row">
                         <div class="form-group col-md-6 no-padding">
                             <label class="col-md-4 control-label text-right no-padding" for="Seller">Seller</label>
@@ -50,41 +48,39 @@
                                 </select>
                             </div>
                         </div>
-                        <!--#region LINHA 2-->
-                        <div class="row">
-                            <div class="form-group col-md-6 no-padding">
-                                <label for="minDate">Min Date</label>
-                                <div class="col-lg-10">
-                                    <input id="minDate" type="text" name="minDate" class="form-control"/>
-                                </div>
-                            </div>
-                            <div class="form-group col-md-6 no-padding">
-                                <label for="maxDate">Max Date</label>
-                                <div class="col-lg-10">
-                                    <input id="maxDate" type="text" name="maxDate" class="form-control"/>
-
-                                </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-md-6 no-padding">
+                            <label for="minDate">Min Date</label>
+                            <div class="col-lg-10">
+                                <input id="minDate" type="text" name="minDate" class="form-control" />
                             </div>
                         </div>
-                        <!--#region LINHA 3-->
-                        <div class="row">
-                            <div class="form-group col-md-6">
-                                <label class="col-md-8 control-label text-right no-padding" for="SalesStatusIds">Sale status</label>
-                                <div class="col-md-8">
-                                    <select id="salesStatusIds" name="SalesStatusIds" multiple class="form-control select2">
-                                        @foreach (var sts in Html.GetEnumSelectList<SalesWebMVC.Models.Enums.SalesStatus>())
-                                        {
-                                            <option value="@sts.Value">@sts.Text</option>
-                                        }
-                                    </select>
-                                </div>
+                        <div class="form-group col-md-6 no-padding">
+                            <label for="maxDate">Max Date</label>
+                            <div class="col-lg-10">
+                                <input id="maxDate" type="text" name="maxDate" class="form-control" />
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-md-6">
+                            <label class="col-md-8 control-label text-right no-padding" for="SalesStatusIds">Sale status</label>
+                            <div class="col-md-8">
+                                <select id="salesStatusIds" name="SalesStatusIds" multiple class="form-control select2">
+                                    @foreach (var sts in Html.GetEnumSelectList<SalesWebMVC.Models.Enums.SalesStatus>())
+                                    {
+                                        <option value="@sts.Value">@sts.Text</option>
+                                    }
+                                </select>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="card-footer text-end">
                     <button id="limparCampos" type="button" class="btn btn-flat btn-labeled" style="margin: 0px 10px;">Clean</button>
-                    <button type="submit" class="btn btn-primary btn-labeled btn-flat"><span class="fa-filter "></span>Search</button>
+                    <button type="submit" class="btn btn-primary btn-labeled btn-flat"><i class="fa fa-filter me-2"></i>Search</button>
                 </div>
             </form>
         </div>
@@ -93,10 +89,9 @@
 
 
 <div id="salesResults" class="pt-2">
-    @await Html.PartialAsync("_SalesTablePartial", Model)
+    @await Html.PartialAsync("_salesTable", Model)
 </div>
 
-<!-- Modal para detalhes -->
 <div class="modal fade" id="detailsModal" tabindex="-1" role="dialog" aria-labelledby="detailsModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
@@ -111,13 +106,53 @@
     </div>
 </div>
 
+<div class="modal fade" id="confirmationModal" tabindex="-1"
+     aria-labelledby="confirmationModalLabel" aria-hidden="true">
+    <div class="modal-dialog justify-content-center">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmationModalLabel">Action confirmation</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p id="confirmationMessage"></p>
+            </div>
+            <div class="modal-footer text-center w-200">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="fade fa-close"></i>No</button>
+                <button type="button" id="btnConfirmAction" class="btn btn-primary"><i class="fade fa-check"></i>Yes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="notificationModal" tabindex="-1" 
+    aria-labelledby="notificationModalLabel" aria-hidden="true">
+    <div class="modal-dialog justify-content-center">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="notificationModalLabel"></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p id="notificationMessage"></p>
+            </div>
+            <div class="modal-footer text-center w-100">
+                <button type="button" class="btn btn-success align-content-center" data-bs-dismiss="modal">Ok</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 
 @section Scripts {
     <script>
+        // URLs expostas ao JavaScript
         window.detailsUrl = '@Url.Action("Details", "SalesRecords")';
-        window.filterUrl = '@Url.Action("")';
+        window.filterUrl = '@Url.Action("Filter", "SalesRecords")'; // URL para a busca AJAX
+        window.billUrl = '@Url.Action("Bill", "SalesRecords")';    // NOVO: URL para fatura
+        window.cancelUrl = '@Url.Action("Cancel", "SalesRecords")'; // NOVO: URL para cancelamento
     </script>
-    <script src="~/js/SalesRecords/SalesRecords-Index.js"
-            defer></script>
+    <script src="~/js/SalesRecords/SalesRecords-Index.js" defer></script>
 }
-

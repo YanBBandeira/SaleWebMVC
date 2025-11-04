@@ -19,6 +19,8 @@ namespace SalesWebMVC.Data
         public DbSet<Supplier> Suppliers { get; set; }
         public DbSet<Product> Products { get; set; }
 
+        public DbSet<OrderItem> OrderItems { get; set; }
+
         public DbSet<InventoryMovement> InventoryMovements { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
@@ -47,6 +49,13 @@ namespace SalesWebMVC.Data
                 .WithMany(s => s.Products) // <--- SEM ARGUMENTO: Relacionamento unidirecional
                 .HasForeignKey(p => p.SupplierId)
                 .IsRequired();
+
+            // 3. Configuração do Relacionamento SalesRecord <-> OrderItem (CRÍTICO!)
+            builder.Entity<SalesRecord>()
+                .HasMany(s => s.OrderItems)          // SalesRecord tem muitos OrderItems
+                .WithOne(i => i.SalesRecord)        // OrderItem pertence a um SalesRecord
+                .HasForeignKey(i => i.SalesRecordId) // A FK é o campo SalesRecordId no OrderItem
+                .OnDelete(DeleteBehavior.Cascade);   // Se a Venda for deletada, os Itens também são
         }
 
     }

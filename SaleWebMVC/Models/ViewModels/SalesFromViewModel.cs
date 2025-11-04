@@ -8,11 +8,24 @@ namespace SalesWebMVC.Models.ViewModels
         public SalesRecord SalesRecord { get; set; }
 
         // A LISTA de vendedores disponíveis para o dropdown
+        public ICollection<Department> Departments { get; set; }
         public ICollection<ApplicationUser> Sellers { get; set; }
 
-        // Lista de departamentos
+        
+        // A coleção de OrderItems que será preenchida pelo formulário.
+        public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
+        public ICollection<ProductDto> Products { get; set; } = new List<ProductDto>();
 
-        public ICollection<Department> Departments { get; set; }
-        public IEnumerable<SalesWebMVC.Models.SalesRecord> Sales { get; set; } 
+        // =======================================================
+        // NOVO: DTO Aninhado (ViewModel de Produto)
+        // =======================================================
+        public class ProductDto
+        {
+            public int Id { get; set; }
+            public string Name { get; set; }
+            public double Price { get; set; }
+
+            // Nenhum relacionamento de navegação de EF Core aqui!
+        }
     }
 }

@@ -14,13 +14,17 @@ namespace SalesWebMVC.Models
         [DisplayFormat(DataFormatString = "{0:F2}")] //0 representa o valor do atributo
         public double Amount { get; set; }
         public SalesStatus Status { get; set; }
-        public ApplicationUser Seller { get; set; }
+
+        public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
+
 
         [Display(Name = "Seller")]
         public string SellerId { get; set; }
+        public ApplicationUser? Seller { get; set; }
 
         [Display(Name = "Department")]
         public int DepartmentId { get; set; }
+        public Department? Department { get; set; }
 
         public SalesRecord() 
         { 

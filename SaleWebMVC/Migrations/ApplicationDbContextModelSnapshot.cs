@@ -215,6 +215,9 @@ namespace SalesWebMVC.Migrations
                     b.Property<int?>("SellerStatus")
                         .HasColumnType("int");
 
+                    b.Property<int?>("StockClerkStatus")
+                        .HasColumnType("int");
+
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("tinyint(1)");
 
@@ -295,7 +298,6 @@ namespace SalesWebMVC.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Observation")
-                        .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("varchar(500)");
 
@@ -306,7 +308,6 @@ namespace SalesWebMVC.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("UserId")
-                        .IsRequired()
                         .HasColumnType("varchar(255)");
 
                     b.HasKey("Id");
@@ -315,7 +316,36 @@ namespace SalesWebMVC.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("inventoryMovements");
+                    b.ToTable("InventoryMovements");
+                });
+
+            modelBuilder.Entity("SalesWebMVC.Models.OrderItem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SalesRecordId")
+                        .HasColumnType("int");
+
+                    b.Property<double>("UnitPrice")
+                        .HasColumnType("double");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductId");
+
+                    b.HasIndex("SalesRecordId");
+
+                    b.ToTable("OrderItems");
                 });
 
             modelBuilder.Entity("SalesWebMVC.Models.Product", b =>
@@ -384,6 +414,8 @@ namespace SalesWebMVC.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CityId");
+
+                    b.HasIndex("DepartmentId");
 
                     b.HasIndex("SellerId");
 
@@ -527,13 +559,30 @@ namespace SalesWebMVC.Migrations
 
                     b.HasOne("SalesWebMVC.Models.ApplicationUser", "User")
                         .WithMany()
-                        .HasForeignKey("UserId")
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("Product");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("SalesWebMVC.Models.OrderItem", b =>
+                {
+                    b.HasOne("SalesWebMVC.Models.Product", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SalesWebMVC.Models.SalesRecord", "SalesRecord")
+                        .WithMany("OrderItems")
+                        .HasForeignKey("SalesRecordId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Product");
 
-                    b.Navigation("User");
+                    b.Navigation("SalesRecord");
                 });
 
             modelBuilder.Entity("SalesWebMVC.Models.Product", b =>
@@ -561,11 +610,19 @@ namespace SalesWebMVC.Migrations
                         .WithMany("SaleRecords")
                         .HasForeignKey("CityId");
 
+                    b.HasOne("SalesWebMVC.Models.Department", "Department")
+                        .WithMany()
+                        .HasForeignKey("DepartmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("SalesWebMVC.Models.ApplicationUser", "Seller")
                         .WithMany("SalesRecords")
                         .HasForeignKey("SellerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Department");
 
                     b.Navigation("Seller");
                 });
@@ -601,6 +658,11 @@ namespace SalesWebMVC.Migrations
             modelBuilder.Entity("SalesWebMVC.Models.Product", b =>
                 {
                     b.Navigation("InventoryMovements");
+                });
+
+            modelBuilder.Entity("SalesWebMVC.Models.SalesRecord", b =>
+                {
+                    b.Navigation("OrderItems");
                 });
 
             modelBuilder.Entity("SalesWebMVC.Models.State", b =>
